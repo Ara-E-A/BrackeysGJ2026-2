@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -9,8 +10,11 @@ public class ShowDialogue : MonoBehaviour
 {
 
     public GameObject diaBox;
+
+    public float typingDelay = 0.05f;
     
     private TextMeshProUGUI textField;
+    private Coroutine typingCoroutine;
 
     public void Start()
     {
@@ -21,8 +25,25 @@ public class ShowDialogue : MonoBehaviour
     {
         if(this.textField != null)
         {
-            this.textField.text = dialogue;
+            if (this.typingCoroutine != null)
+            {
+                StopCoroutine(this.typingCoroutine);
+            }
+
+            this.typingCoroutine = StartCoroutine(typeDialogue(dialogue));
         }
+    }
+
+    private IEnumerator typeDialogue(string dialogue)
+    {
+        this.textField.text = string.Empty;
+
+        foreach (char character in dialogue)
+        {
+            this.textField.text += character;
+            yield return new WaitForSeconds(this.typingDelay);
+        }
+        this.typingCoroutine = null;
     }
 
     public void getTextField()
