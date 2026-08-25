@@ -14,17 +14,20 @@ class AgeRule : Rule
         this.specificExcludedAges = specificExcludedAges;
     }
 
-    public override void enforceRule()
+    public override bool enforceRule()
     {
         if (this.playerAge < ageRange.Item1 || this.playerAge > ageRange.Item2)
         {
             // Player is outside the allowed age range
             // Handle the violation of the rule here
+            return false;
         } else if (Array.IndexOf(specificExcludedAges, this.playerAge) >= 0)
         {
             // Player's age is specifically excluded
             // Handle the violation of the rule here
+            return false;
         }
+        return true;
     }
 
     public void checkAge(float age)

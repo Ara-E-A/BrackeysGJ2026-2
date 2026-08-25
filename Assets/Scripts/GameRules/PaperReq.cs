@@ -36,6 +36,18 @@ public class PaperReq : Paper
         this.ageRule = new AgeRule(ageRange, specificExcludedAges);
     }
 
+    private void makeNameRule()
+    {
+        string[] names = RulesList.getNames();
+
+        string[] forbiddenNames = new string[3];
+        for (int i = 0; i < 3; i++)
+        {
+            forbiddenNames[i] = names[Random.Range(0, names.Length)];
+        }
+        this.nameRule = new NameRule(forbiddenNames);
+    }
+
     private void makeOriginRule()
     {
         //randomize length range
