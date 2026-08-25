@@ -1,24 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private PaperReq req;
-    [SerializeField] private PlayerPaper playerPaper;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public PaperReq req;
+    public PlayerPaper playerPaper;
+    public List<Clue> clues;
+
     void Start()
     {
-        this.req = new PaperReq();
+        //Generate rules
+        req = new PaperReq();
+
+        //Generate player identity
         playerPaper = new PlayerPaper();
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        //Generate clues
+        ClueGenerator generator = new ClueGenerator(req);
+        clues = generator.GenerateClues();
 
-    public void initPaperReqs()
-    {
-        
+        Debug.Log("Rules, PlayerPaper, and Clues generated.");
     }
 }

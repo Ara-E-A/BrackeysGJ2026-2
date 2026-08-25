@@ -6,18 +6,13 @@ using UnityEngine;
 
 public class PaperReq : Paper
 {
-    public string name;
-    public string origin;
-    public string sex;
-    public float id;
-    public float height;
 
-    private Rule<float> ageRule;
-    private Rule<float> heightRule;
-    private Rule<string> originRule;
-    private Rule<string> nameRule;
-    private Rule<string> sexRule;
-    private Rule<int> idRule;
+    public AgeRule AgeRule { get; private set; }
+    public HeightRule HeightRule { get; private set; }
+    public OriginRule OriginRule { get; private set; }
+    public NameRule NameRule { get; private set; }
+    public SexRule SexRule { get; private set; }
+    public IDRule IDRule { get; private set; }
 
     public PaperReq()
     {
@@ -43,7 +38,7 @@ public class PaperReq : Paper
             UnityEngine.Random.Range(0f, 108f)
         };
 
-        this.ageRule = new AgeRule(ageRange, specificExcludedAges);
+        AgeRule = new AgeRule(ageRange, specificExcludedAges);
     }
 
     private void makeHeightRule()
@@ -67,7 +62,7 @@ public class PaperReq : Paper
             excludedEnds[i] = end;
         }
 
-        this.heightRule = new HeightRule(minHeight, maxHeight, excludedStarts, excludedEnds);
+        HeightRule = new HeightRule(minHeight, maxHeight, excludedStarts, excludedEnds);
     }
 
     private void makeNameRule()
@@ -79,13 +74,13 @@ public class PaperReq : Paper
         {
             string candidate = names[UnityEngine.Random.Range(0, names.Length)];
 
-            while (forbiddenNames.Contains(candidate))
+            while (Array.IndexOf(forbiddenNames, candidate) >= 0)
                 candidate = names[UnityEngine.Random.Range(0, names.Length)];
 
             forbiddenNames[i] = candidate;
         }
 
-        this.nameRule = new NameRule(forbiddenNames);
+        NameRule = new NameRule(forbiddenNames);
     }
 
     private void makeOriginRule()
@@ -105,14 +100,15 @@ public class PaperReq : Paper
         for (int i = 0; i < forbiddenCount; i++)
             forbiddenChars[i] = (char)UnityEngine.Random.Range('A', 'Z' + 1);
 
-        this.originRule = new OriginRule(minLen, maxLen, requiredChars, forbiddenChars);
+        OriginRule = new OriginRule(minLen, maxLen, requiredChars, forbiddenChars);
     }
 
     private void makeSexRule()
     {
         string[] allSexes =
         {
-            "Male", "Female", "Nonbinary", "Agender", "Fluid", "Glorb", "Vorb", "Zorb", "Blorb"
+            "Male", "Female", "Nonbinary", "Agender", "Fluid",
+            "Glorb", "Vorb", "Zorb", "Blorb"
         };
 
         int count = UnityEngine.Random.Range(2, 5);
@@ -121,7 +117,7 @@ public class PaperReq : Paper
         for (int i = 0; i < count; i++)
             allowed[i] = allSexes[UnityEngine.Random.Range(0, allSexes.Length)];
 
-        this.sexRule = new SexRule(allowed);
+        SexRule = new SexRule(allowed);
     }
 
     private void makeIDRule()
@@ -136,6 +132,6 @@ public class PaperReq : Paper
         while (forbiddenDigit == requiredDigit)
             forbiddenDigit = UnityEngine.Random.Range(0, 10);
 
-        this.idRule = new IDRule(mustBeDivisible, divisor, requiredDigit, forbiddenDigit);
+        IDRule = new IDRule(mustBeDivisible, divisor, requiredDigit, forbiddenDigit);
     }
 }

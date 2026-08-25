@@ -3,17 +3,18 @@ using UnityEngine;
 
 public class HeightRule : Rule<float>
 {
-    private float minHeight;
-    private float maxHeight;
-    private float[] excludedRangesStart;   //start of excluded ranges
-    private float[] excludedRangesEnd;     //end of excluded ranges
+    public float minHeight;
+    public float maxHeight;
 
-    public HeightRule(float minHeight, float maxHeight, float[] excludedRangesStart, float[] excludedRangesEnd)
+    public float[] excludedStarts;
+    public float[] excludedEnds;
+
+    public HeightRule(float minHeight, float maxHeight, float[] excludedStarts, float[] excludedEnds)
     {
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
-        this.excludedRangesStart = excludedRangesStart;
-        this.excludedRangesEnd = excludedRangesEnd;
+        this.excludedStarts = excludedStarts;
+        this.excludedEnds = excludedEnds;
     }
 
     public override bool enforceRule(float playerHeight)
@@ -23,10 +24,10 @@ public class HeightRule : Rule<float>
             return false;
 
         //Check excluded ranges
-        for (int i = 0; i < excludedRangesStart.Length; i++)
+        for (int i = 0; i < excludedStarts.Length; i++)
         {
-            if (playerHeight >= excludedRangesStart[i] &&
-                playerHeight <= excludedRangesEnd[i])
+            if (playerHeight >= excludedStarts[i] &&
+                playerHeight <= excludedEnds[i])
             {
                 return false;
             }

@@ -1,25 +1,22 @@
-class OriginRule : Rule<string>
+public class OriginRule : Rule<string>
 {
-    //Origin Rules are rules concerning the player's origin, things like
-    //no people from a certain country or region.
+    public int minLen;
+    public int maxLen;
 
-    private int minLength;
-    private int maxLength;
+    public char[] requiredChars;
+    public char[] forbiddenChars;
 
-    private char[] requiredChars;
-    private char[] forbiddenChars;
-    
-    public OriginRule(int minLength, int maxLength, char[] requiredChars, char[] forbiddenChars)
+    public OriginRule(int minLen, int maxLen, char[] requiredChars, char[] forbiddenChars)
     {
-        this.minLength = minLength;
-        this.maxLength = maxLength;
+        this.minLen = minLen;
+        this.maxLen = maxLen;
         this.requiredChars = requiredChars;
         this.forbiddenChars = forbiddenChars;
     }
 
     public override bool enforceRule(string origin)
     {
-       if (origin.Length < minLength || origin.Length > maxLength)
+       if (origin.Length < minLen || origin.Length > maxLen)
             return false;
 
         foreach (char c in requiredChars)

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SexRule : Rule<string>
 {
-    private string[] allowedSexes;
+    public string[] allowedSexes;
 
     public SexRule(string[] allowedSexes)
     {

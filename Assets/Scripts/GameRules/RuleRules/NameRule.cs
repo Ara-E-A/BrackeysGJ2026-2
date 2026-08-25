@@ -2,7 +2,7 @@ using System;
 
 public class NameRule : Rule<string>
 {
-    private string[] forbiddenNames;
+    public string[] forbiddenNames;
 
     public NameRule(string[] forbiddenNames)
     {

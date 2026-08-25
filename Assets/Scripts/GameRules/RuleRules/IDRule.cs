@@ -3,10 +3,11 @@ using UnityEngine;
 
 public class IDRule : Rule<int>
 {
-    private bool mustBeDivisible;
-    private int divisor;
-    private int requiredDigit;
-    private int forbiddenDigit;
+    public bool mustBeDivisible;
+    public int divisor;
+
+    public int requiredDigit;
+    public int forbiddenDigit;
 
     public IDRule(bool mustBeDivisible, int divisor, int requiredDigit, int forbiddenDigit)
     {

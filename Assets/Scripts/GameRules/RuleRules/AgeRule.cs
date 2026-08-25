@@ -1,14 +1,12 @@
 using System;
 using UnityEngine;
 
-class AgeRule : Rule<float>
+public class AgeRule : Rule<float>
 {
-    //Age Rules are rules concerning the player's age, things like
-    //minimum or maximum age requirements.
-    float[] specificExcludedAges;
-    Tuple<int, int> ageRange;
+    public Tuple<int,int> ageRange;
+    public float[] specificExcludedAges;
 
-    public AgeRule(Tuple<int, int> ageRange, float[] specificExcludedAges)
+    public AgeRule(Tuple<int,int> ageRange, float[] specificExcludedAges)
     {
         this.ageRange = ageRange;
         this.specificExcludedAges = specificExcludedAges;
