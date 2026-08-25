@@ -1,4 +1,4 @@
-class SexRule : Rule
+class SexRule : Rule<string>
 {
     // Sex Rules are rules concerning the player's sex, things like
     // requirements based on the stated sex.
@@ -10,7 +10,7 @@ class SexRule : Rule
 
     }
 
-    public override bool enforceRule()
+    public override bool enforceRule(string playerSex)
     {
         // Implementation for enforcing sex rule
         return true;

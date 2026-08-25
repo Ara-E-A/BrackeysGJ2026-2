@@ -1,6 +1,6 @@
 using System;
 
-class AgeRule : Rule
+class AgeRule : Rule<float>
 {
     // Age Rules are rules concerning the player's age, things like
     // minimum or maximum age requirements.
@@ -14,7 +14,7 @@ class AgeRule : Rule
         this.specificExcludedAges = specificExcludedAges;
     }
 
-    public override bool enforceRule()
+    public override bool enforceRule(float playerAge)
     {
         if (this.playerAge < ageRange.Item1 || this.playerAge > ageRange.Item2)
         {

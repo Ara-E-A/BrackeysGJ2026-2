@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class RulesList
 {
-    public Rule[] nameRules;
-    public Rule[] originRules;
-    public Rule[] sexRules;
-    public Rule[] idRules;
-    public Rule[] heightRules;
+    public Rule<string>[] nameRules;
+    public Rule<string>[] originRules;
+    public Rule<string>[] sexRules;
+    public Rule<int>[] idRules;
+    public Rule<float>[] heightRules;
 
     public static string[] names;
 

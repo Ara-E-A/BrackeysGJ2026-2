@@ -1,4 +1,4 @@
-public abstract class Rule
+public abstract class Rule<T>
 {
-    public abstract bool enforceRule();
+    public abstract bool enforceRule(T value);
 }

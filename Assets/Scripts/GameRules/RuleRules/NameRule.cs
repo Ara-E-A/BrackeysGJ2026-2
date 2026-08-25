@@ -1,6 +1,6 @@
 using System;
 
-class NameRule : Rule
+class NameRule : Rule<string>
 {
     // Name Rules are rules concerning the player name, things like
     // no people starting with an "L" or names longer than 12 characters.
@@ -13,7 +13,7 @@ class NameRule : Rule
         this.forbiddenNames = forbiddenNames;
     }
 
-    public override bool enforceRule()
+    public override bool enforceRule(string playerName)
     {
         if (forbiddenNames != null && Array.IndexOf(forbiddenNames, this.playerName) >= 0)
         {

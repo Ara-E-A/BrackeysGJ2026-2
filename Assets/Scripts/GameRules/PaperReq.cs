@@ -11,13 +11,12 @@ public class PaperReq : Paper
     public float id;
     public float height;
 
-    private Rule ageRule;
-    private Rule heightRule;
-    private Rule originRule;
-    private Rule nameRule;
-    private Rule sexRule;
-    private Rule idRule;
-
+    private Rule<float> ageRule;
+    private Rule<float> heightRule;
+    private Rule<string> originRule;
+    private Rule<string> nameRule;
+    private Rule<string> sexRule;
+    private Rule<int> idRule;
 
     // randomize a requirement paper, then later, enforce the rules over player paper vs reqpaper somehow.
     public PaperReq()

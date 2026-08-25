@@ -1,4 +1,4 @@
-class HeightRule : Rule
+class HeightRule : Rule<float>
 {
     // Height Rules are rules concerning the player's height, things like
     // minimum or maximum height requirements.
@@ -10,7 +10,7 @@ class HeightRule : Rule
 
     }
 
-    public override bool enforceRule()
+    public override bool enforceRule(float playerHeight)
     {
         // Implementation for enforcing height rule
         return true;

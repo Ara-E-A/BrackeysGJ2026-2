@@ -1,4 +1,4 @@
-class OriginRule : Rule
+class OriginRule : Rule<string>
 {
     // Origin Rules are rules concerning the player's origin, things like
     // no people from a certain country or region.

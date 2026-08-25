@@ -1,4 +1,4 @@
-class IDRule : Rule
+class IDRule : Rule<int>
 {
     // ID Rules are rules concerning the player's identification, things like
     // valid ID formats or expiration requirements.
@@ -10,7 +10,7 @@ class IDRule : Rule
 
     }
 
-    public override bool enforceRule()
+    public override bool enforceRule(int playerID)
     {
         // Implementation for enforcing ID rule
         return true;
