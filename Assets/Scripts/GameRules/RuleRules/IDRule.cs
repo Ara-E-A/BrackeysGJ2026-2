@@ -10,7 +10,7 @@ class IDRule : Rule
 
     }
 
-    void enforceRule()
+    public override void enforceRule()
     {
 
     }

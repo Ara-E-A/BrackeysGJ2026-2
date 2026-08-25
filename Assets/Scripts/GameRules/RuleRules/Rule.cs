@@ -1,8 +1,4 @@
-abstract class Rule
+public abstract class Rule
 {
-    void enforceRule()
-    {
-        // enforce the rule
-    }
-
+    public abstract void enforceRule();
 }

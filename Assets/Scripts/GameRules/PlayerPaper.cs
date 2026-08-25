@@ -1,4 +1,4 @@
-public class PaperReq : Paper
+public class PlayerPaper : Paper
 {
     public string name;
     public string origin;
@@ -6,9 +6,8 @@ public class PaperReq : Paper
     public float id;
     public float height;
 
-    public PaperReq()
+    public PlayerPaper()
     {
-           
-    }
 
+    }
 }

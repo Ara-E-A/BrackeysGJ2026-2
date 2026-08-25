@@ -10,7 +10,7 @@ class SexRule : Rule
 
     }
 
-    void enforceRule()
+    public override void enforceRule()
     {
 
     }

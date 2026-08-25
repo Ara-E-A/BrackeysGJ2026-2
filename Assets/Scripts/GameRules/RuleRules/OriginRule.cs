@@ -10,7 +10,7 @@ class OriginRule : Rule
         
     }
 
-    void enforceRule()
+    public override void enforceRule()
     {
         
     }

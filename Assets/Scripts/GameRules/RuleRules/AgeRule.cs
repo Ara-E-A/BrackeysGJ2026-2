@@ -10,7 +10,7 @@ class AgeRule : Rule
 
     }
 
-    void enforceRule()
+    public override void enforceRule()
     {
 
     }

@@ -10,7 +10,7 @@ class NameRule : Rule
         
     }
 
-    void enforceRule()
+    public override void enforceRule()
     {
         
     }
