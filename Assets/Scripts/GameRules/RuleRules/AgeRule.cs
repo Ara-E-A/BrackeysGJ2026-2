@@ -1,10 +1,10 @@
 using System;
+using UnityEngine;
 
 class AgeRule : Rule<float>
 {
-    // Age Rules are rules concerning the player's age, things like
-    // minimum or maximum age requirements.
-    float playerAge;
+    //Age Rules are rules concerning the player's age, things like
+    //minimum or maximum age requirements.
     float[] specificExcludedAges;
     Tuple<int, int> ageRange;
 
@@ -16,22 +16,16 @@ class AgeRule : Rule<float>
 
     public override bool enforceRule(float playerAge)
     {
-        if (this.playerAge < ageRange.Item1 || this.playerAge > ageRange.Item2)
-        {
-            // Player is outside the allowed age range
-            // Handle the violation of the rule here
+        //Check range
+        if (playerAge < ageRange.Item1 || playerAge > ageRange.Item2)
             return false;
-        } else if (Array.IndexOf(specificExcludedAges, this.playerAge) >= 0)
-        {
-            // Player's age is specifically excluded
-            // Handle the violation of the rule here
-            return false;
-        }
+
+        //Check excluded ages
+        foreach (float excluded in specificExcludedAges)
+            if (Mathf.Approximately(playerAge, excluded))
+                return false;
+
         return true;
     }
 
-    public void checkAge(float age)
-    {
-        this.playerAge = age;
-    }
 }

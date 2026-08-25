@@ -1,18 +1,50 @@
-class IDRule : Rule<int>
+using System;
+using UnityEngine;
+
+public class IDRule : Rule<int>
 {
-    // ID Rules are rules concerning the player's identification, things like
-    // valid ID formats or expiration requirements.
+    private bool mustBeDivisible;
+    private int divisor;
+    private int requiredDigit;
+    private int forbiddenDigit;
 
-    //TODO: come up with a list of rules this can choose from.
-
-    public IDRule()
+    public IDRule(bool mustBeDivisible, int divisor, int requiredDigit, int forbiddenDigit)
     {
-
+        this.mustBeDivisible = mustBeDivisible;
+        this.divisor = divisor;
+        this.requiredDigit = requiredDigit;
+        this.forbiddenDigit = forbiddenDigit;
     }
 
     public override bool enforceRule(int playerID)
     {
-        // Implementation for enforcing ID rule
+        string idString = playerID.ToString();
+
+        //Must be exactly 10 digits
+        if (idString.Length != 10)
+            return false;
+
+        //Divisibility rule
+        if (mustBeDivisible)
+        {
+            if (playerID % divisor != 0)
+                return false;
+        }
+        else
+        {
+            if (playerID % divisor == 0)
+                return false;
+        }
+
+        //required digit
+        if (!idString.Contains(requiredDigit.ToString()))
+            return false;
+
+        //forbidden digit
+        if (idString.Contains(forbiddenDigit.ToString()))
+            return false;
+
         return true;
     }
+
 }

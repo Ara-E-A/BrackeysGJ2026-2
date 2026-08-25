@@ -1,18 +1,23 @@
-class SexRule : Rule<string>
+using System;
+using UnityEngine;
+
+public class SexRule : Rule<string>
 {
-    // Sex Rules are rules concerning the player's sex, things like
-    // requirements based on the stated sex.
+    private string[] allowedSexes;
 
-    //TODO: come up with a list of rules this can choose from.
-
-    public SexRule()
+    public SexRule(string[] allowedSexes)
     {
-
+        this.allowedSexes = allowedSexes;
     }
 
     public override bool enforceRule(string playerSex)
     {
-        // Implementation for enforcing sex rule
-        return true;
+        foreach (string s in allowedSexes)
+        {
+            if (playerSex.Equals(s, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
     }
+
 }

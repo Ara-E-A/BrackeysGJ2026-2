@@ -1,18 +1,38 @@
-class HeightRule : Rule<float>
+using System;
+using UnityEngine;
+
+public class HeightRule : Rule<float>
 {
-    // Height Rules are rules concerning the player's height, things like
-    // minimum or maximum height requirements.
+    private float minHeight;
+    private float maxHeight;
+    private float[] excludedRangesStart;   //start of excluded ranges
+    private float[] excludedRangesEnd;     //end of excluded ranges
 
-    //TODO: come up with a list of rules this can choose from.
-
-    public HeightRule()
+    public HeightRule(float minHeight, float maxHeight, float[] excludedRangesStart, float[] excludedRangesEnd)
     {
-
+        this.minHeight = minHeight;
+        this.maxHeight = maxHeight;
+        this.excludedRangesStart = excludedRangesStart;
+        this.excludedRangesEnd = excludedRangesEnd;
     }
 
     public override bool enforceRule(float playerHeight)
     {
-        // Implementation for enforcing height rule
+        //Check allowed range
+        if (playerHeight < minHeight || playerHeight > maxHeight)
+            return false;
+
+        //Check excluded ranges
+        for (int i = 0; i < excludedRangesStart.Length; i++)
+        {
+            if (playerHeight >= excludedRangesStart[i] &&
+                playerHeight <= excludedRangesEnd[i])
+            {
+                return false;
+            }
+        }
+
         return true;
     }
+
 }
