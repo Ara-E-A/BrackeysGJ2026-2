@@ -10,9 +10,10 @@ class OriginRule : Rule
         
     }
 
-    public override void enforceRule()
+    public override bool enforceRule()
     {
-        
+        // Implementation for enforcing origin rule
+        return true;
     }
 
 }

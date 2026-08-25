@@ -10,8 +10,9 @@ class SexRule : Rule
 
     }
 
-    public override void enforceRule()
+    public override bool enforceRule()
     {
-
+        // Implementation for enforcing sex rule
+        return true;
     }
 }
