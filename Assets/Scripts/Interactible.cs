@@ -6,7 +6,7 @@ public class Interactible : MonoBehaviour
 
     public void OnInteract()
     {
-        ShowDialogue dialogueUI = FindObjectOfType<ShowDialogue>();
+        ShowDialogue dialogueUI = FindAnyObjectByType<ShowDialogue>();
 
         if (dialogueUI != null)
         {

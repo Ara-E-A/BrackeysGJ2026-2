@@ -81,9 +81,6 @@
             "path": "/home/a/.dotnet/dotnet"
         }
     ],
-    "github.copilot.enable": {
-        "*": false
-    },
     "terminal.integrated.env.linux": {
         "DOTNET_ROOT": "/home/a/.dotnet",
         "PATH": "/home/a/.dotnet:${env:PATH}"
