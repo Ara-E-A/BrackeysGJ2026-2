@@ -1,29 +1,33 @@
+using System;
+
 class AgeRule : Rule
 {
     // Age Rules are rules concerning the player's age, things like
     // minimum or maximum age requirements.
     float playerAge;
+    float[] specificExcludedAges;
+    Tuple<int, int> ageRange;
 
-    public AgeRule()
+    public AgeRule(Tuple<int, int> ageRange, float[] specificExcludedAges)
     {
-        Tuple<int, int> ageRange;
-        float[] specificExcludedAges;
+        this.ageRange = ageRange;
+        this.specificExcludedAges = specificExcludedAges;
     }
 
     public override void enforceRule()
     {
-        if (playerAge < ageRange.Item1 || playerAge > ageRange.Item2)
+        if (this.playerAge < ageRange.Item1 || this.playerAge > ageRange.Item2)
         {
             // Player is outside the allowed age range
             // Handle the violation of the rule here
-        } else if (specificExcludedAges.Contains(playerAge))
+        } else if (Array.IndexOf(specificExcludedAges, this.playerAge) >= 0)
         {
             // Player's age is specifically excluded
             // Handle the violation of the rule here
         }
     }
 
-    public checkAge(float age)
+    public void checkAge(float age)
     {
         this.playerAge = age;
     }

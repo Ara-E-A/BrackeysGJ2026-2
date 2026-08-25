@@ -1,3 +1,8 @@
+using System.Linq;
+using System.Text;
+using Unity.VisualScripting;
+using UnityEngine;
+
 public class PaperReq : Paper
 {
     public string name;
@@ -23,9 +28,9 @@ public class PaperReq : Paper
     private void makeAgeRule()
     {
         //randomize for range of allowed ages
-        Tuple<int, int> ageRange = new Tuple<int, int>(random.Range(0, 54), random.Range(54, 108));
+        System.Tuple<int, int> ageRange = new System.Tuple<int, int>(Random.Range(0, 54), Random.Range(54, 108));
         //randomize three specific ages that are not allowed
-        float[] specificExcludedAges = new float[] { random.Range(0, 108), random.Range(0, 108), random.Range(0, 108) };
+        float[] specificExcludedAges = new float[] { Random.Range(0, 108), Random.Range(0, 108), Random.Range(0, 108) };
         
         this.ageRule = new AgeRule(ageRange, specificExcludedAges);
     }
