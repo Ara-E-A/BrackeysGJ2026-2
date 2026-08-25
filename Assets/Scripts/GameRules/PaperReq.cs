@@ -23,6 +23,7 @@ public class PaperReq : Paper
     public PaperReq()
     {
         makeAgeRule();
+        makeOriginRule();
     }
 
     private void makeAgeRule()
@@ -33,6 +34,33 @@ public class PaperReq : Paper
         float[] specificExcludedAges = new float[] { Random.Range(0, 108), Random.Range(0, 108), Random.Range(0, 108) };
         
         this.ageRule = new AgeRule(ageRange, specificExcludedAges);
+    }
+
+    private void makeOriginRule()
+    {
+        //randomize length range
+        int minLen = Random.Range(3, 6);
+        int maxLen = Random.Range(6, 12);
+
+        //randomize required characters
+        int requiredCount = Random.Range(1, 4);
+        char[] requiredChars = new char[requiredCount];
+        for (int i = 0; i < requiredCount; i++)
+        {
+            requiredChars[i] = (char)Random.Range('A', 'Z' + 1);
+        }
+
+        //randomize forbidden characters
+        int forbiddenCount = Random.Range(1, 4);
+        char[] forbiddenChars = new char[forbiddenCount];
+        for (int i = 0; i < forbiddenCount; i++)
+        {
+            forbiddenChars[i] = (char)Random.Range('A', 'Z' + 1);
+        }
+
+        this.originRule = new OriginRule(minLen, maxLen, requiredChars, forbiddenChars);
+
+        // Debug.Log(originRule.ToString());
     }
 
 }

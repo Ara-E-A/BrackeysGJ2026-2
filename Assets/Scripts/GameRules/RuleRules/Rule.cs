@@ -1,4 +1,4 @@
 public abstract class Rule
 {
-    public abstract void enforceRule();
+    public abstract bool enforceRule();
 }
