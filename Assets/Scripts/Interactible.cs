@@ -13,12 +13,13 @@ public class Interactible : MonoBehaviour
         Terminal
     }
     public InteractibleType type;
-
+    public EventUI evUI;
     private NPCDialogue npcDialogue;
 
     private void Awake()
     {
         npcDialogue = GetComponent<NPCDialogue>();
+        evUI = FindAnyObjectByType<EventUI>();
     }
 
     public void OnInteract()
@@ -35,6 +36,11 @@ public class Interactible : MonoBehaviour
         if (type == InteractibleType.NPC)
         {
             HandleNPCDialogue(dialogueUI);
+        }
+        else if (type == InteractibleType.Note)
+        {
+            Debug.Log("Clicked Note");
+            evUI.showEvent("Go Away, i'm Trying to sleep.");
         }
         else
         {
