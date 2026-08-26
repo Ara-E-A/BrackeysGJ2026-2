@@ -49,7 +49,9 @@ public class Interactible : MonoBehaviour
             ui.showDialogue("NPC has no dialogue.");
             return;
         }
+
         ClueHolder holder = GetComponent<ClueHolder>();
+
         if (!npcDialogue.HasInteracted)
         {
             string line = npcDialogue.GetStartingLine();
@@ -60,9 +62,12 @@ public class Interactible : MonoBehaviour
         {
             string message = npcDialogue.BuildMessageFromClue(holder.clue);
             ui.ShowNPCDialogue(message, PlayerDialogueOption.Leave);
-            DBoxControl.WakeyWakey();         
-            dialogueUI = FindAnyObjectByType<ShowDialogue>();
-            dialogueUI.showDialogue(dialogueText);
+
+            DBoxControl.WakeyWakey();
+
+            ShowDialogue refreshedUI = FindAnyObjectByType<ShowDialogue>();
+            refreshedUI.showDialogue(message); 
         }
     }
+
 }
