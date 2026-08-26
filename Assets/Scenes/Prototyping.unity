@@ -658,8 +658,10 @@ GameObject:
   - component: {fileID: 603291438}
   - component: {fileID: 603291437}
   - component: {fileID: 603291441}
+  - component: {fileID: 603291443}
+  - component: {fileID: 603291442}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: NPC
   m_TagString: Clickable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -770,7 +772,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 933659c0eba47454f9c4556b377ca262, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  dialogueText: Hello from this object!
+  type: 0
+--- !u!114 &603291442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603291435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 657acafc05eadab47b7834d8558972af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClueHolder
+  clue:
+    ruleType: 0
+    truthType: 0
+--- !u!114 &603291443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603291435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c92c0fda7cdcc214a85593b5e96770b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
+  startingLines: []
+  messagePartsA: []
+  messagePartsB: []
+  messagePartsC: []
 --- !u!1 &609455598
 GameObject:
   m_ObjectHideFlags: 0

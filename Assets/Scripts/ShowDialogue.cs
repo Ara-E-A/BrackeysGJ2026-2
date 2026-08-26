@@ -21,6 +21,14 @@ public class ShowDialogue : MonoBehaviour
         getTextField();
     }
 
+    public void ShowNPCDialogue(string npcLine, PlayerDialogueOption option)
+    {
+        //TODO
+        showDialogue(npcLine);
+
+        Debug.Log($"NPC Option: {option}");
+    }
+
     public void showDialogue(string dialogue)
     {
         if(this.textField != null)
