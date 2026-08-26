@@ -8,13 +8,15 @@ public class Interactible : MonoBehaviour
     {
         ShowDialogue dialogueUI = FindAnyObjectByType<ShowDialogue>();
 
-        if (dialogueUI != null)
+        if (DBoxControl.speaking)
         {
             dialogueUI.showDialogue(dialogueText);
         }
         else
         {
-            Debug.LogError("ShowDialogue UI not found in scene!");
+            DBoxControl.WakeyWakey();         
+            dialogueUI = FindAnyObjectByType<ShowDialogue>();
+            dialogueUI.showDialogue(dialogueText);
         }
     }
 }

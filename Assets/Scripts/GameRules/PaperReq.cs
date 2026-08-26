@@ -107,7 +107,7 @@ public class PaperReq : Paper
     {
         string[] allSexes =
         {
-            "Male", "Female", "Nonbinary", "Agender", "Fluid",
+            "Male", "Female", "Nonbinary", "Agender", "Fluid", "Plasma",
             "Glorb", "Vorb", "Zorb", "Blorb"
         };
 
