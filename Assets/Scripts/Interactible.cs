@@ -25,6 +25,8 @@ public class Interactible : MonoBehaviour
     {
         ShowDialogue dialogueUI = FindAnyObjectByType<ShowDialogue>();
         if (dialogueUI == null)
+
+        if (DBoxControl.speaking)
         {
             Debug.LogError("ShowDialogue UI not found in scene!");
             return;
@@ -58,6 +60,9 @@ public class Interactible : MonoBehaviour
         {
             string message = npcDialogue.BuildMessageFromClue(holder.clue);
             ui.ShowNPCDialogue(message, PlayerDialogueOption.Leave);
+            DBoxControl.WakeyWakey();         
+            dialogueUI = FindAnyObjectByType<ShowDialogue>();
+            dialogueUI.showDialogue(dialogueText);
         }
     }
 }
