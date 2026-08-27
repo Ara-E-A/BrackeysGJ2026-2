@@ -1,4 +1,3 @@
-using System.Collections;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +19,7 @@ public class DBoxControl : MonoBehaviour
         {
             this.dialogGroup = gameObject.AddComponent<CanvasGroup>();
         }
-        StartCoroutine(fadeOutAfterDelay());
+        fadeOut();
     }
 
     public void Update()
@@ -34,26 +33,14 @@ public class DBoxControl : MonoBehaviour
         else if (!fading && !speaking)
         {
             fading = true;
-            StartCoroutine(fadeOutAfterDelay());
+            fadeOut();
         }
     }
 
-    private IEnumerator fadeOutAfterDelay()
+    private void fadeOut()
     {
-        yield return new WaitForSeconds(0.5f);
-
         if (!speaking)
         {
-            float duration = 1f;
-            float elapsed = 0f;
-
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                dialogGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
-                yield return null;
-            }
-
             dialogGroup.alpha = 0f;
             dialog.alpha = 0f;
         }

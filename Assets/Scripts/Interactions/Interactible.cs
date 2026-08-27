@@ -9,6 +9,14 @@ public abstract class Interactible : MonoBehaviour
         evUI = FindAnyObjectByType<EventUI>();
     }
 
+    //Definitely not clean but for some reason it was not finding the evUI specifically for table objects..?
+    protected virtual void Update() {
+        if(evUI == null)
+        {
+            evUI = FindAnyObjectByType<EventUI>();
+        } 
+    }
+
     public void OnInteract()
     {
         if (DBoxControl.speaking)

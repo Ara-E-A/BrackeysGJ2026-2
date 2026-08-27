@@ -20,11 +20,6 @@ public class Thing : Interactible
 
     protected override void Interact()
     {
-        if (evUI == null)
-        {
-            Debug.LogError("EventUI not found in scene!");
-            return;
-        }
 
         if (interactEvent == null)
         {
