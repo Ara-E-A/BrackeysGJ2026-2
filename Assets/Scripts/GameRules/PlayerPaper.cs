@@ -9,6 +9,7 @@ public class PlayerPaper : Paper
     public float height;
     public float age;
 
+    //TODO: Find a way to turn this info into a clean string to put on the PaperHUD.
     public PlayerPaper()
     {
         GenerateRandomPaper();

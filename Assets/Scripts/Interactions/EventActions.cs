@@ -2,6 +2,7 @@ using UnityEngine;
 
 public static class EventActions
 {
+    //TODO: Implement other event functions.
     public static void addNameInfo()
     {}
 

@@ -35,6 +35,7 @@ public class DBoxControl : MonoBehaviour
             fading = true;
             fadeOut();
         }
+
     }
 
     private void fadeOut()
