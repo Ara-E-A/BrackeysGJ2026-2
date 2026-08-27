@@ -21,6 +21,14 @@ public class ShowDialogue : MonoBehaviour
         getTextField();
     }
 
+    public void Update()
+    {
+        if(!DBoxControl.speaking && textField != null)
+        {
+            textField.text = "";
+        }
+    }
+
     public void ShowNPCDialogue(string npcLine, PlayerDialogueOption option)
     {
         //TODO
@@ -60,8 +68,7 @@ public class ShowDialogue : MonoBehaviour
 
         if (this.textField != null) 
         {
-            Debug.Log("Got the text thingy.");
-            showDialogue("When the Bingus is Schmungus.");
+            showDialogue("");
         }
     }
 }
