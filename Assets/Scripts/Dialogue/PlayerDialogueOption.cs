@@ -4,7 +4,8 @@ public enum PlayerDialogueOption
     Leave,
     Thanks,
     ISee,
-    HowKind
+    HowKind,
+    Submit
 }
 
 public static class PlayerDialogueOptionExtensions
@@ -15,6 +16,7 @@ public static class PlayerDialogueOptionExtensions
         {
             case PlayerDialogueOption.ISee: return "I see";
             case PlayerDialogueOption.HowKind: return "How kind of you";
+            case PlayerDialogueOption.Submit: return "Submit Paper";
             default: return option.ToString();
         }
     }

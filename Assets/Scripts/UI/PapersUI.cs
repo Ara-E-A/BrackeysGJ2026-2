@@ -115,6 +115,14 @@ public class PapersUI : MonoBehaviour
             DialogManager.Instance.CloseActiveDialogue();
         }
 
+        // Also clears any non-DialogManager dialogue (e.g. the Inspector): wipes the
+        // choice buttons and resets DBoxControl so interaction is not left soft-locked.
+        ShowDialogue openDialogue = FindAnyObjectByType<ShowDialogue>();
+        if (openDialogue != null)
+        {
+            openDialogue.EndNPCLine();
+        }
+
         GameManager gm = FindAnyObjectByType<GameManager>();
         paper = gm != null ? gm.playerPaper : null;
         if (paper == null)

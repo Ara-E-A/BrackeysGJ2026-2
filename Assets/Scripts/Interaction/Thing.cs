@@ -1,57 +1,39 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// A readable world object - a note, a stained table, a flickering screen. Clicking it
+/// opens the shared dialogue window with one plain informational clue and a single Leave
+/// option (see <see cref="Interactable.ShowInfo"/>).
+///
+/// Text source:
+///   1. <see cref="overrideText"/> if set - arbitrary hand-authored info.
+///   2. otherwise <see cref="ClueInterpreter"/> on a sibling <see cref="ClueHolder"/>'s
+///      clue. The clue's <see cref="ClueTruth"/> decides whether it reads true / false /
+///      half-true / misleading; a missing clue falls back to a vague line.
+/// </summary>
 public class Thing : Interactable
 {
-    private InteractEvent interactEvent;
-
-    public enum type
-    {
-        Note,
-        Table,
-        Screen
-    }
+    // Flavour tag only (used by Thingamabob and the inspector); no longer drives behaviour.
+    public enum type { Note, Table, Screen }
     public type thingType;
 
-    public void Start()
-    {
-        interactEvent = getEventForType();
-    }
+    [TextArea]
+    [Tooltip("Shown verbatim. If empty, a sibling ClueHolder's clue is interpreted instead.")]
+    public string overrideText;
 
     protected override void Interact()
     {
-
-        if (interactEvent == null)
-        {
-            Debug.LogError($"No InteractEvent configured on {name}.");
-            return;
-        }
-
-        if (evUI == null)
-        {
-            evUI = FindAnyObjectByType<EventUI>();
-        }
-
-        if (evUI == null)
-        {
-            Debug.LogError("EventUI not found in scene!");
-            return;
-        }
-
-        evUI.showEvent(interactEvent);
+        ShowInfo(GetInfoText());
     }
 
-    public InteractEvent getEventForType()
+    public string GetInfoText()
     {
-        switch(thingType){
-            case type.Note:
-            return InteractEventCatalog.templates[0];
-            case type.Table:
-            return InteractEventCatalog.templates[1];
-            case type.Screen:
-            return InteractEventCatalog.templates[2];
+        if (!string.IsNullOrWhiteSpace(overrideText))
+        {
+            return overrideText;
         }
-        
-        return null;
+
+        Clue clue = TryGetComponent(out ClueHolder holder) ? holder.clue : null;
+        return ClueInterpreter.Interpret(clue);
     }
 }

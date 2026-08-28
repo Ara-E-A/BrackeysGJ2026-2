@@ -1,6 +1,6 @@
-using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>One labelled choice button in the dialogue window (label + click action).</summary>
 [System.Serializable]
 public class InteractEventOption
 {
@@ -16,17 +16,4 @@ public class InteractEventOption
         this.label = label;
         EventAction.AddListener(action);
     }
-}
-
-[System.Serializable]
-public class InteractEvent
-{
-    [TextArea]
-    public string eventText;
-    [Range(2, 4)]
-    public InteractEventOption[] options = new InteractEventOption[2]
-    {
-        new InteractEventOption(),
-        new InteractEventOption()
-    };
 }
