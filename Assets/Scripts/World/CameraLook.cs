@@ -21,11 +21,27 @@ public class CameraLook : MonoBehaviour
     {
         Application.targetFrameRate = 120;
         getCamTrans();
+
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        if (gameManager != null && gameManager.playerPaper != null)
+        {
+            SetCameraHeightFromPaper(gameManager.playerPaper);
+        }
     }
     
     public void getCamTrans()
     {
         mainCamera = GetComponent<Camera>();
+    }
+
+    public void SetCameraHeightFromPaper(PlayerPaper paper)
+    {
+        if (mainCamera == null || paper == null)
+            return;
+
+        Vector3 position = mainCamera.transform.position;
+        position.y = paper.GetCameraHeight();
+        mainCamera.transform.position = position;
     }
 
     public void TurnLeft()
