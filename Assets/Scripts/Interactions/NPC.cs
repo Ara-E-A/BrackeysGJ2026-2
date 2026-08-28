@@ -3,6 +3,7 @@ using UnityEngine;
 public class NPC : Interactible
 {
     private NPCDialogue npcDialogue;
+    private NPCConversation conversation;
 
     protected override void Awake()
     {
@@ -25,23 +26,7 @@ public class NPC : Interactible
             return;
         }
 
-        ClueHolder holder = GetComponent<ClueHolder>();
-
-        if (!npcDialogue.HasInteracted)
-        {
-            string line = npcDialogue.GetStartingLine();
-            npcDialogue.MarkInteracted();
-            dialogueUI.ShowNPCDialogue(line, PlayerDialogueOption.Continue);
-        }
-        else
-        {
-            string message = npcDialogue.BuildMessageFromClue(holder.clue);
-            dialogueUI.ShowNPCDialogue(message, PlayerDialogueOption.Leave);
-
-            DBoxControl.WakeyWakey();
-
-            ShowDialogue refreshedUI = FindAnyObjectByType<ShowDialogue>();
-            refreshedUI.showDialogue(message);
-        }
+        conversation = new NPCConversation(npcDialogue, GetComponent<ClueHolder>(), dialogueUI);
+        conversation.Begin();
     }
 }

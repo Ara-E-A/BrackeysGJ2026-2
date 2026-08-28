@@ -12,13 +12,19 @@ public class ShowDialogue : MonoBehaviour
     public GameObject diaBox;
 
     public float typingDelay = 0.05f;
-    
+
+    [SerializeField] private Talker talker;
+
     private TextMeshProUGUI textField;
     private Coroutine typingCoroutine;
 
     public void Start()
     {
         getTextField();
+        if (talker == null)
+        {
+            talker = FindAnyObjectByType<Talker>();
+        }
     }
 
     public void Update()
@@ -29,12 +35,38 @@ public class ShowDialogue : MonoBehaviour
         }
     }
 
-    public void ShowNPCDialogue(string npcLine, PlayerDialogueOption option)
+    public void ShowNPCLine(string text, params InteractEventOption[] choices)
     {
-        //TODO
-        showDialogue(npcLine);
+        DBoxControl.WakeyWakey();
+        showDialogue(text);
 
-        Debug.Log($"NPC Option: {option}");
+        if (choices == null || choices.Length < 1)
+        {
+            return;
+        }
+
+        if (talker == null)
+        {
+            talker = FindAnyObjectByType<Talker>();
+        }
+
+        if (talker == null)
+        {
+            Debug.LogError("ShowDialogue: no Talker found to build choice buttons.");
+            return;
+        }
+
+        talker.CreateButtons(choices);
+    }
+
+    public void EndNPCLine()
+    {
+        if (talker != null)
+        {
+            talker.WipeButtons();
+        }
+
+        DBoxControl.stopSpeaking();
     }
 
     public void showDialogue(string dialogue)

@@ -32,9 +32,9 @@ public class Talker : MonoBehaviour
 
     public void CreateButtons(params InteractEventOption[] buttonOptions)
     {
-        if (buttonOptions == null || buttonOptions.Length < 2 || buttonOptions.Length >+ 4)
+        if (buttonOptions == null || buttonOptions.Length < 1 || buttonOptions.Length > 4)
         {
-            Debug.LogError("Talker requires between 2 and 4 buttons.");
+            Debug.LogError("Talker requires between 1 and 4 buttons.");
             return;
         }
 

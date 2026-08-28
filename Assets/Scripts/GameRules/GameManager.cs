@@ -20,5 +20,19 @@ public class GameManager : MonoBehaviour
         clues = generator.GenerateClues();
 
         Debug.Log("Rules, PlayerPaper, and Clues generated.");
+
+        //Fill NPC dialogue banks from the Souls-style library
+        NPCDialoguePopulator dialoguePopulator = FindAnyObjectByType<NPCDialoguePopulator>();
+        if (dialoguePopulator != null)
+        {
+            dialoguePopulator.Populate();
+        }
+
+        //Hand clues out to the ClueHolders in the scene
+        ClueDistributor distributor = FindAnyObjectByType<ClueDistributor>();
+        if (distributor != null)
+        {
+            distributor.Distribute(clues);
+        }
     }
 }
