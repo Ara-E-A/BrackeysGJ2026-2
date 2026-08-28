@@ -18,6 +18,9 @@ public class Interactor : MonoBehaviour
         if (mouse == null)
             return;
 
+        if (PapersUI.IsOpen)
+            return;
+
         if (mouse.leftButton.wasPressedThisFrame)
         {
             GameObject clickedObject = GetClickedObject();

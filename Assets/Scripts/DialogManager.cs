@@ -66,7 +66,7 @@ public class DialogManager : MonoBehaviour
     /// <summary>Runs greeting -> Continue/Leave -> clue -> final response -> end for one NPC.</summary>
     public void StartNPCDialogue(string greeting, string clue)
     {
-        if (stage != Stage.Idle || DBoxControl.speaking)
+        if (stage != Stage.Idle || DBoxControl.speaking || PapersUI.IsOpen)
         {
             return;
         }
@@ -84,6 +84,12 @@ public class DialogManager : MonoBehaviour
         ui.ShowNPCLine(current.greeting,
             Option(PlayerDialogueOption.Continue, ShowClue),
             Option(PlayerDialogueOption.Leave, EndDialogue));
+    }
+
+    /// <summary>Ends the current dialogue immediately (e.g. when the Papers view opens over it).</summary>
+    public void CloseActiveDialogue()
+    {
+        EndDialogue();
     }
 
     private void ShowClue()

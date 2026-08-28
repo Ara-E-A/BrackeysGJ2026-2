@@ -13,14 +13,6 @@ public class PaperHUD : MonoBehaviour
 	private Vector2 originalSize;
 	private Coroutine animationCoroutine;
 
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			HideImportantInformation();
-		}
-	}
-
 	private void Awake()
 	{
 		if (paper == null)
@@ -40,6 +32,24 @@ public class PaperHUD : MonoBehaviour
 		}
 
 		SetInformationVisible(false);
+	}
+
+	/// <summary>Zoom the paper into focus without touching the info text (used by PapersUI).</summary>
+	public void Open()
+	{
+		if (paper == null)
+		{
+			return;
+		}
+
+		SetInformationVisible(false);
+		StartAnimation(GetExpandedPosition(), originalSize * expandedScale, false);
+	}
+
+	/// <summary>Zoom the paper back to its resting place.</summary>
+	public void Close()
+	{
+		HideImportantInformation();
 	}
 
 	public void ShowImportantInformation(string information)

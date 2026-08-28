@@ -19,11 +19,11 @@ public class IDRule : Rule<int>
 
     public override bool enforceRule(int playerID)
     {
-        string idString = playerID.ToString();
-
-        //Must be exactly 10 digits
-        if (idString.Length != 10)
+        //Must be a 4-digit ID (0000-9999)
+        if (playerID < 0 || playerID > 9999)
             return false;
+
+        string idString = playerID.ToString("D4");
 
         //Divisibility rule
         if (mustBeDivisible)

@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class PlayerPaper : Paper
 {
+    public static readonly string[] AllSexes =
+    {
+        "Male", "Female", "Nonbinary", "Agender", "Fluid", "Plasma",
+        "Glorb", "Vorb", "Zorb", "Blorb"
+    };
+
     public string name;
     public string origin;
     public string sex;
@@ -22,12 +28,7 @@ public class PlayerPaper : Paper
 
         origin = GenerateRandomOrigin();
 
-        string[] allSexes =
-        {
-            "Male", "Female", "Nonbinary", "Agender", "Fluid",
-            "Glorb", "Vorb", "Zorb", "Blorb"
-        };
-        sex = allSexes[UnityEngine.Random.Range(0, allSexes.Length)];
+        sex = AllSexes[UnityEngine.Random.Range(0, AllSexes.Length)];
 
         height = UnityEngine.Random.Range(100f, 220f);
 
@@ -47,13 +48,9 @@ public class PlayerPaper : Paper
         return s;
     }
 
-    private long GenerateRandomID()
+    private int GenerateRandomID()
     {
-        string idStr = "";
-        for (int i = 0; i < 10; i++)
-        {
-            idStr += UnityEngine.Random.Range(0, 10).ToString();
-        }
-        return long.Parse(idStr);
+        // 4-digit ID (0000-9999), matching IDRule and the Papers UI field.
+        return UnityEngine.Random.Range(0, 10000);
     }
 }
