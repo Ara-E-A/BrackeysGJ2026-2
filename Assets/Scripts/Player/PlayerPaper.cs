@@ -23,7 +23,7 @@ public class PlayerPaper : Paper
 
     private void GenerateRandomPaper()
     {
-        string[] names = RulesList.getNames();
+        string[] names = NameGenerator.GetNames();
         name = names[UnityEngine.Random.Range(0, names.Length)];
 
         origin = GenerateRandomOrigin();

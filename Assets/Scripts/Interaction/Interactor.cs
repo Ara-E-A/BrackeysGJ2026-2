@@ -27,13 +27,13 @@ public class Interactor : MonoBehaviour
 
             if (clickedObject != null && clickedObject.CompareTag("Clickable"))
             {
-                if (clickedObject.TryGetComponent<Interactible>(out var interactible))
+                if (clickedObject.TryGetComponent<Interactable>(out var interactable))
                 {
-                    interactible.OnInteract();
+                    interactable.OnInteract();
                 }
                 else
                 {
-                    Debug.Log("Clickable object has no Interactible component.");
+                    Debug.Log("Clickable object has no Interactable component.");
                 }
             }
         }

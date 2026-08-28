@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NPC : Interactible
+public class NPC : Interactable
 {
     private NPCDialogue npcDialogue;
 

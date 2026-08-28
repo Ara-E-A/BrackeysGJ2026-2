@@ -14,7 +14,7 @@ using UnityEngine;
 /// Payload keys are whatever <see cref="ClueGenerator"/> put in the dictionary; missing
 /// keys and a null/absent payload degrade to a vague line instead of throwing.
 /// </summary>
-public static class NPCClueInterpreter
+public static class ClueInterpreter
 {
     public static string Interpret(Clue clue)
     {

@@ -67,7 +67,7 @@ public class PaperReq : Paper
 
     private void makeNameRule()
     {
-        string[] names = RulesList.getNames();
+        string[] names = NameGenerator.GetNames();
         string[] forbiddenNames = new string[3];
 
         for (int i = 0; i < 3; i++)

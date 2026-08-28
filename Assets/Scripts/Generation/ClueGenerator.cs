@@ -215,7 +215,7 @@ public class ClueGenerator
             }
         ));
 
-        string[] allNames = RulesList.getNames();
+        string[] allNames = NameGenerator.GetNames();
         string[] forbidden = allNames.Where(n => !rule.forbiddenNames.Contains(n)).ToArray();
 
         clues.Add(new Clue(

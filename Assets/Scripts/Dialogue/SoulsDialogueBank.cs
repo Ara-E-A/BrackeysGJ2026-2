@@ -11,7 +11,7 @@
 ///
 /// Every entry in every bank is INDEPENDENTLY grammatical and tone-matched, so any
 /// A x B x C combination reads coherently with no cross-fragment grammar. The clue text
-/// itself is produced separately by NPCClueInterpreter and appended after a blank line;
+/// itself is produced separately by ClueInterpreter and appended after a blank line;
 /// fragments never need to agree with its wording.
 ///
 /// Tone: archaic, weary, cryptic, occasionally dark-funny. Recurring imagery: the queue,

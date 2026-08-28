@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RulesList
+public class NameGenerator
 {
     public Rule<string>[] nameRules;
     public Rule<string>[] originRules;
@@ -10,7 +10,7 @@ public class RulesList
 
     public static string[] names;
 
-    public static string[] getNames(){
+    public static string[] GetNames(){
         names = namesList();
         return names;
     }

@@ -64,7 +64,7 @@ public class NPCDialogue : MonoBehaviour
         AddIfPresent(parts, Pick(messagePartsC, null, rng));
 
         string wrapper = string.Join(" ", parts);
-        string clueText = NPCClueInterpreter.Interpret(clue);
+        string clueText = ClueInterpreter.Interpret(clue);
 
         return string.IsNullOrWhiteSpace(wrapper) ? clueText : $"{wrapper}\n\n{clueText}";
     }

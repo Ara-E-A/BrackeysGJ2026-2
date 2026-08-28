@@ -1,18 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// A readable world object (sign, poster, scrap of paper) built on <see cref="Interactible"/>.
+/// A readable world object (sign, poster, scrap of paper) built on <see cref="Interactable"/>.
 /// Shows ONE line of information through the same dialogue box as NPCs
 /// (<see cref="ShowDialogue"/> / <see cref="DBoxControl"/>), with a single Leave button.
 ///
 /// Text source, in priority order:
 ///   1. <see cref="overrideText"/> if set - arbitrary hand-authored info.
 ///   2. A sibling <see cref="NPCDialogue"/>'s Souls-wrapped clue, if that component is present.
-///   3. Otherwise <see cref="NPCClueInterpreter"/> on a sibling <see cref="ClueHolder"/>'s
+///   3. Otherwise <see cref="ClueInterpreter"/> on a sibling <see cref="ClueHolder"/>'s
 ///      clue. The clue's <see cref="ClueTruth"/> controls whether it reads true / false /
 ///      half-true / misleading. Falls back to a vague line when nothing is wired.
 /// </summary>
-public class InfoHolder : Interactible
+public class InfoHolder : Interactable
 {
     [TextArea]
     [Tooltip("Shown verbatim. If empty, a sibling ClueHolder's clue is interpreted instead.")]
@@ -49,6 +49,6 @@ public class InfoHolder : Interactible
 
         return TryGetComponent(out NPCDialogue dialogue)
             ? dialogue.BuildMessageFromClue(clue)
-            : NPCClueInterpreter.Interpret(clue);
+            : ClueInterpreter.Interpret(clue);
     }
 }

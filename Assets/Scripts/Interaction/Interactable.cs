@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Interactible : MonoBehaviour
+public abstract class Interactable : MonoBehaviour
 {
     public EventUI evUI;
 

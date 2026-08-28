@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Thing : Interactible
+public class Thing : Interactable
 {
     private InteractEvent interactEvent;
 
