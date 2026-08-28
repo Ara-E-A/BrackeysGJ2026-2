@@ -22,11 +22,13 @@ public class PapersUI : MonoBehaviour
 {
     public static bool IsOpen { get; private set; }
 
+    // Height is fixed at 120-230 cm and enforced, not designer-tunable.
+    private const int HeightMin = 120;
+    private const int HeightMax = 230;
+
     [Header("Field caps")]
     [SerializeField] private int nameMaxLength = 20;
     [SerializeField] private int originMaxLength = 20;
-    [SerializeField] private float heightMin = 50f;
-    [SerializeField] private float heightMax = 260f;
     [SerializeField] private int ageMin = 0;
     [SerializeField] private int ageMax = 108;
     [SerializeField] private int idMin = 0;
@@ -188,7 +190,12 @@ public class PapersUI : MonoBehaviour
         nameField.SetTextWithoutNotify(paper.name ?? string.Empty);
         originField.SetTextWithoutNotify(paper.origin ?? string.Empty);
         idField.SetTextWithoutNotify(Mathf.Clamp(Mathf.RoundToInt(paper.id), idMin, idMax).ToString());
-        heightField.SetTextWithoutNotify(paper.height.ToString("0.#"));
+
+        // Correct any out-of-range height on the paper itself so it can never be submitted.
+        int height = Mathf.Clamp(Mathf.RoundToInt(paper.height), HeightMin, HeightMax);
+        paper.height = height;
+        heightField.SetTextWithoutNotify(height.ToString());
+
         ageField.SetTextWithoutNotify(Mathf.RoundToInt(paper.age).ToString());
 
         int sexIndex = Array.IndexOf(PlayerPaper.AllSexes, paper.sex);
@@ -266,13 +273,15 @@ public class PapersUI : MonoBehaviour
         });
 
         heightField = AddInputRow("Height");
-        heightField.contentType = TMP_InputField.ContentType.DecimalNumber;
+        heightField.contentType = TMP_InputField.ContentType.IntegerNumber;
+        heightField.characterLimit = 3;
+        heightField.onValidateInput = HeightValidate;
         heightField.onEndEdit.AddListener(value =>
         {
-            float.TryParse(value, out float parsed);
-            float clamped = Mathf.Clamp(parsed, heightMin, heightMax);
+            int.TryParse(value, out int parsed);
+            int clamped = Mathf.Clamp(parsed, HeightMin, HeightMax);
             if (paper != null) paper.height = clamped;
-            heightField.SetTextWithoutNotify(clamped.ToString("0.#"));
+            heightField.SetTextWithoutNotify(clamped.ToString());
         });
 
         ageField = AddInputRow("Age");
@@ -289,6 +298,24 @@ public class PapersUI : MonoBehaviour
     private static char LettersOnly(string text, int charIndex, char addedChar)
     {
         return char.IsLetter(addedChar) ? addedChar : '\0';
+    }
+
+    // Digits only, and rejects any keystroke that would push the value above HeightMax.
+    // (The 120 minimum is enforced by the end-edit clamp - you must be able to type "1", "12"...)
+    private static char HeightValidate(string text, int charIndex, char addedChar)
+    {
+        if (!char.IsDigit(addedChar))
+        {
+            return '\0';
+        }
+
+        string prospective = text.Substring(0, charIndex) + addedChar + text.Substring(charIndex);
+        if (int.TryParse(prospective, out int value) && value > HeightMax)
+        {
+            return '\0';
+        }
+
+        return addedChar;
     }
 
     private GameObject NewRow(string label)

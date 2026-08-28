@@ -30,7 +30,7 @@ public class PlayerPaper : Paper
 
         sex = AllSexes[UnityEngine.Random.Range(0, AllSexes.Length)];
 
-        height = UnityEngine.Random.Range(100f, 220f);
+        height = UnityEngine.Random.Range(120f, 230f); // stay within the Papers UI's enforced range
 
         age = UnityEngine.Random.Range(0f, 108f);
 
