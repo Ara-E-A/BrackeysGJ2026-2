@@ -17,7 +17,9 @@ public class PlayerPaper : Paper
 
     public float GetCameraHeight()
     {
-        return height / 100f;
+        // Strict 120-230 clamp so the camera can never be driven outside the valid range,
+        // whatever a caller left in 'height'. cm -> metres.
+        return UnityEngine.Mathf.Clamp(height, 120f, 230f) / 100f;
     }
 
     //TODO: Find a way to turn this info into a clean string to put on the PaperHUD.
@@ -35,7 +37,7 @@ public class PlayerPaper : Paper
 
         sex = AllSexes[UnityEngine.Random.Range(0, AllSexes.Length)];
 
-        height = UnityEngine.Random.Range(50f, 220f);
+        height = UnityEngine.Random.Range(120f, 230f); // stay within the Papers UI's enforced range
 
         age = UnityEngine.Random.Range(0f, 108f);
 

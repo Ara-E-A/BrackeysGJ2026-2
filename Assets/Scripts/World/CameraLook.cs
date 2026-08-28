@@ -12,10 +12,12 @@ public class CameraLook : MonoBehaviour
     [SerializeField] private float moveDistance = 10f;
     [SerializeField] private float movementDuration = 0.35f;
     [SerializeField] private float rotationDuration = 0.35f;
+    [SerializeField] private float heightDuration = 0.3f;
     public Camera mainCamera;
 
     private Coroutine movementCoroutine;
     private Coroutine rotationCoroutine;
+    private Coroutine heightCoroutine;
 
     void Start()
     {
@@ -25,23 +27,67 @@ public class CameraLook : MonoBehaviour
         GameManager gameManager = FindAnyObjectByType<GameManager>();
         if (gameManager != null && gameManager.playerPaper != null)
         {
-            SetCameraHeightFromPaper(gameManager.playerPaper);
+            SetCameraHeightFromPaper(gameManager.playerPaper, true);
         }
     }
-    
+
     public void getCamTrans()
     {
         mainCamera = GetComponent<Camera>();
     }
 
-    public void SetCameraHeightFromPaper(PlayerPaper paper)
+    /// <summary>
+    /// Drive the camera's world Y from the paper's height. <see cref="PlayerPaper.GetCameraHeight"/>
+    /// already clamps to 120-230 cm. Smooth by default; pass instant for the initial placement.
+    /// </summary>
+    public void SetCameraHeightFromPaper(PlayerPaper paper, bool instant = false)
     {
-        if (mainCamera == null || paper == null)
+        if (paper == null)
             return;
 
-        Vector3 position = mainCamera.transform.position;
-        position.y = paper.GetCameraHeight();
-        mainCamera.transform.position = position;
+        if (mainCamera == null)
+            getCamTrans();
+        if (mainCamera == null)
+            return;
+
+        float targetY = paper.GetCameraHeight();
+
+        if (heightCoroutine != null)
+            StopCoroutine(heightCoroutine);
+
+        if (instant || heightDuration <= 0f)
+        {
+            Vector3 snapped = mainCamera.transform.position;
+            snapped.y = targetY;
+            mainCamera.transform.position = snapped;
+            heightCoroutine = null;
+            return;
+        }
+
+        heightCoroutine = StartCoroutine(SmoothHeight(targetY));
+    }
+
+    private IEnumerator SmoothHeight(float targetY)
+    {
+        float startY = mainCamera.transform.position.y;
+        float elapsed = 0f;
+
+        while (elapsed < heightDuration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / heightDuration));
+
+            Vector3 position = mainCamera.transform.position;
+            position.y = Mathf.Lerp(startY, targetY, progress);
+            mainCamera.transform.position = position;
+
+            yield return null;
+        }
+
+        Vector3 final = mainCamera.transform.position;
+        final.y = targetY;
+        mainCamera.transform.position = final;
+        heightCoroutine = null;
     }
 
     public void TurnLeft()
