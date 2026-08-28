@@ -38,6 +38,7 @@ public class PapersUI : MonoBehaviour
     private RectTransform papersOpen;
     private Button papersOpenButton;
     private TextMeshProUGUI closedText;
+    private CameraLook cameraLook;
 
     private GameObject fieldsRoot;
     private bool built;
@@ -191,15 +192,36 @@ public class PapersUI : MonoBehaviour
         originField.SetTextWithoutNotify(paper.origin ?? string.Empty);
         idField.SetTextWithoutNotify(Mathf.Clamp(Mathf.RoundToInt(paper.id), idMin, idMax).ToString());
 
-        // Correct any out-of-range height on the paper itself so it can never be submitted.
+        // Correct any out-of-range height on the paper itself so it can never be submitted,
+        // then align the camera with it.
         int height = Mathf.Clamp(Mathf.RoundToInt(paper.height), HeightMin, HeightMax);
         paper.height = height;
         heightField.SetTextWithoutNotify(height.ToString());
+        UpdateCameraHeight();
 
         ageField.SetTextWithoutNotify(Mathf.RoundToInt(paper.age).ToString());
 
         int sexIndex = Array.IndexOf(PlayerPaper.AllSexes, paper.sex);
         sexField.SetValueWithoutNotify(sexIndex < 0 ? 0 : sexIndex);
+    }
+
+    // Smoothly slide the camera to the (already-clamped) paper height.
+    private void UpdateCameraHeight()
+    {
+        if (paper == null)
+        {
+            return;
+        }
+
+        if (cameraLook == null)
+        {
+            cameraLook = FindAnyObjectByType<CameraLook>();
+        }
+
+        if (cameraLook != null)
+        {
+            cameraLook.SetCameraHeightFromPaper(paper);
+        }
     }
 
     // ---------------- runtime UI construction ----------------
@@ -276,12 +298,21 @@ public class PapersUI : MonoBehaviour
         heightField.contentType = TMP_InputField.ContentType.IntegerNumber;
         heightField.characterLimit = 3;
         heightField.onValidateInput = HeightValidate;
+        heightField.onValueChanged.AddListener(value =>
+        {
+            // Live: validate -> clamp -> store -> move the camera as the player types.
+            int.TryParse(value, out int parsed);
+            int clamped = Mathf.Clamp(parsed, HeightMin, HeightMax);
+            if (paper != null) paper.height = clamped;
+            UpdateCameraHeight();
+        });
         heightField.onEndEdit.AddListener(value =>
         {
             int.TryParse(value, out int parsed);
             int clamped = Mathf.Clamp(parsed, HeightMin, HeightMax);
             if (paper != null) paper.height = clamped;
             heightField.SetTextWithoutNotify(clamped.ToString());
+            UpdateCameraHeight();
         });
 
         ageField = AddInputRow("Age");
