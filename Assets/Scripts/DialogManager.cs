@@ -1,57 +1,124 @@
 using UnityEngine;
-using Ink.Runtime;
-using System.Collections.Generic;
+using UnityEngine.Events;
 
+/// <summary>
+/// The game's single, non-Ink NPC dialogue flow:
+///
+///   greeting  -> [Continue] [Leave]
+///     Continue -> clue -> [Thanks] [I see] [How kind of you] -> end
+///     Leave    -> end
+///
+/// </summary>
 public class DialogManager : MonoBehaviour
 {
-    public static DialogManager Instance;
+    private static DialogManager instance;
 
-    private Story story;
-    private bool playing = false;
+    public static DialogManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindAnyObjectByType<DialogManager>();
+                if (instance == null)
+                {
+                    instance = new GameObject(nameof(DialogManager)).AddComponent<DialogManager>();
+                }
+            }
+
+            return instance;
+        }
+    }
+
+    private enum Stage { Idle, Greeting, Clue }
+
+    /// <summary>The non-Ink dialogue data: the fixed lines for the NPC currently talking.</summary>
+    [System.Serializable]
+    private struct Line
+    {
+        public string greeting;
+        public string clue;
+    }
+
+    private Line current;
+    private Stage stage = Stage.Idle;
+    private ShowDialogue ui;
 
     private void Awake()
     {
-        Instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        instance = this;
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        TextAsset inkJSON = Resources.Load<TextAsset>("NPCDialog");
-        story = new Story(inkJSON.text);
+        if (instance == this)
+        {
+            instance = null;
+        }
     }
 
+    /// <summary>Runs greeting -> Continue/Leave -> clue -> final response -> end for one NPC.</summary>
     public void StartNPCDialogue(string greeting, string clue)
     {
-        if (playing) return;
-        playing = true;
+        if (stage != Stage.Idle || DBoxControl.speaking)
+        {
+            return;
+        }
 
-        // Set Ink variables
-        story.variablesState["greeting"] = greeting;
-        story.variablesState["clue"] = clue;
+        ui = FindAnyObjectByType<ShowDialogue>();
+        if (ui == null)
+        {
+            Debug.LogError("DialogManager: no ShowDialogue in the scene.");
+            return;
+        }
 
-        // Start at knot
-        story.ChoosePathString("NPC_Start");
+        current = new Line { greeting = greeting, clue = clue };
+        stage = Stage.Greeting;
 
-        ContinueStory();
+        ui.ShowNPCLine(current.greeting,
+            Option(PlayerDialogueOption.Continue, ShowClue),
+            Option(PlayerDialogueOption.Leave, EndDialogue));
     }
 
-    public void ContinueStory()
+    private void ShowClue()
     {
-        if (story.canContinue)
+        if (stage != Stage.Greeting)
         {
-            string line = story.Continue();
-            DialogUI.Instance.ShowLine(line, story.currentChoices);
+            return;
         }
-        else
+
+        stage = Stage.Clue;
+
+        ui.ShowNPCLine(current.clue,
+            Option(PlayerDialogueOption.Thanks, EndDialogue),
+            Option(PlayerDialogueOption.ISee, EndDialogue),
+            Option(PlayerDialogueOption.HowKind, EndDialogue));
+    }
+
+    private void EndDialogue()
+    {
+        if (stage == Stage.Idle)
         {
-            playing = false;
-            DialogUI.Instance.Hide();
+            return;
+        }
+
+        stage = Stage.Idle;
+        current = default;
+
+        if (ui != null)
+        {
+            ui.EndNPCLine();
         }
     }
 
-    public void ChooseChoice(int index)
+    private static InteractEventOption Option(PlayerDialogueOption option, UnityAction onSelected)
     {
-        story.ChooseChoiceIndex(index);
-        ContinueStory();
+        return new InteractEventOption(option.ToLabel(), onSelected);
     }
 }

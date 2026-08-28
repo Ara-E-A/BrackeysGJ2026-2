@@ -27,6 +27,17 @@ public class Thing : Interactible
             return;
         }
 
+        if (evUI == null)
+        {
+            evUI = FindAnyObjectByType<EventUI>();
+        }
+
+        if (evUI == null)
+        {
+            Debug.LogError("EventUI not found in scene!");
+            return;
+        }
+
         evUI.showEvent(interactEvent);
     }
 
