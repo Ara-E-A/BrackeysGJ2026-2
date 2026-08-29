@@ -96,9 +96,14 @@ public class ShowDialogue : MonoBehaviour
 
     public void getTextField()
     {
-        this.textField = this.GetComponentInParent<TextMeshProUGUI>();
+        // The dialogue text now lives on a dedicated "DialogueText" child that renders
+        // above the frame; fall back to a child search if it was renamed.
+        Transform textTransform = transform.Find("DialogueText");
+        this.textField = textTransform != null
+            ? textTransform.GetComponent<TextMeshProUGUI>()
+            : GetComponentInChildren<TextMeshProUGUI>(true);
 
-        if (this.textField != null) 
+        if (this.textField != null)
         {
             showDialogue("");
         }

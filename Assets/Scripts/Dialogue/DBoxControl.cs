@@ -1,5 +1,4 @@
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 
 public class DBoxControl : MonoBehaviour
@@ -12,8 +11,11 @@ public class DBoxControl : MonoBehaviour
 
     public void Start()
     {
-        this.dialog = GetComponent<TextMeshProUGUI>();
-        this.dialogOptionsBox = GetComponentInChildren<TextMeshProUGUI>();
+        Transform textTransform = transform.Find("DialogueText");
+        this.dialog = textTransform != null
+            ? textTransform.GetComponent<TextMeshProUGUI>()
+            : GetComponentInChildren<TextMeshProUGUI>(true);
+        this.dialogOptionsBox = this.dialog;
         this.dialogGroup = GetComponent<CanvasGroup>();
         if (this.dialogGroup == null)
         {
@@ -24,6 +26,14 @@ public class DBoxControl : MonoBehaviour
 
     public void Update()
     {
+        // Gate UI raycasts with the dialogue state: while speaking the whole dialogue
+        // box (Panel / options / close button) blocks clicks; when closed it lets them
+        // through so world raycasting is normal again.
+        if (dialogGroup != null)
+        {
+            dialogGroup.blocksRaycasts = speaking;
+        }
+
         if(speaking)
         {
             fading = false;

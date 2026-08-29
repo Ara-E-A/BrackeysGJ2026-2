@@ -50,11 +50,13 @@ public class Talker : MonoBehaviour
         grid.constraintCount = 2;
         grid.cellSize = buttonSize;
         grid.spacing = spacing;
+        transform.SetAsLastSibling();
 
         for (int index = 0; index < buttonOptions.Length; index++)
         {
             GameObject buttonObject = new GameObject($"DialogButton{index + 1}", typeof(RectTransform), typeof(Image), typeof(Button));
             buttonObject.transform.SetParent(transform, false);
+            buttonObject.transform.SetAsLastSibling();
             Button button = buttonObject.GetComponent<Button>();
             buttons.Add(button);
             InteractEventOption option = buttonOptions[index];

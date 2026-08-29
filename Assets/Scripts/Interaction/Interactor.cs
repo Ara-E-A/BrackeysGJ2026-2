@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class Interactor : MonoBehaviour
@@ -18,11 +19,18 @@ public class Interactor : MonoBehaviour
         if (mouse == null)
             return;
 
-        if (PapersUI.IsOpen)
+        // The Papers form or an active dialogue window owns input entirely - while either
+        // is up, ignore world raycasts completely. Normal raycasting resumes the frame the
+        // dialog box closes (DBoxControl.speaking goes false).
+        if (PapersUI.IsOpen || DBoxControl.speaking)
             return;
 
         if (mouse.leftButton.wasPressedThisFrame)
         {
+            // A click that landed on any UI element must never fall through to a world object.
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
             GameObject clickedObject = GetClickedObject();
 
             if (clickedObject != null && clickedObject.CompareTag("Clickable"))
