@@ -1,160 +1,200 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
-/// Controls the end-of-game overlay in the camera HUD. It activates its root object,
-/// switches between the Win and Lose child panels, and slides itself into view from below.
+/// Full-screen win/lose overlay that mimics the intro screen: a black pane with typed text
+/// that fades out after the message finishes.
 /// </summary>
 public class EndScreenUI : MonoBehaviour
 {
-    [Header("Panels")]
-    [SerializeField] private RectTransform winPanel;
-    [SerializeField] private RectTransform losePanel;
+    [Header("Text")]
+    [TextArea(2, 6)]
+    [SerializeField] private string winText = "You win.";
+    [TextArea(2, 6)]
+    [SerializeField] private string loseText = "You lose.";
 
-    [Header("Animation")]
-    [SerializeField] private float slideDuration = 0.6f;
-    [SerializeField] private Vector2 visibleAnchoredPosition = Vector2.zero;
-    [SerializeField] private Vector2 hiddenAnchoredPosition = new Vector2(0f, -500f);
+    [Header("Timing")]
+    [SerializeField] private float typeDelay = 0.04f;
+    [SerializeField] private float pauseAfterTyping = 0.8f;
+    [SerializeField] private float fadeDuration = 0.7f;
 
-    private RectTransform rootRect;
+    [Header("Appearance")]
+    [SerializeField] private int fontSize = 54;
+    [SerializeField] private Color textColor = Color.white;
+
     private CanvasGroup canvasGroup;
-    private Coroutine slideCoroutine;
+    private TextMeshProUGUI textComponent;
+    private Image backgroundImage;
+    private Coroutine endRoutine;
 
     private void Awake()
     {
-        rootRect = GetComponent<RectTransform>();
-        if (rootRect == null)
+        BuildOverlay();
+        gameObject.SetActive(false);
+    }
+
+    private void BuildOverlay()
+    {
+        Canvas targetCanvas = FindAnyObjectByType<Canvas>();
+        if (targetCanvas == null)
         {
-            rootRect = transform as RectTransform;
+            GameObject canvasObject = new GameObject("EndCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            targetCanvas = canvasObject.GetComponent<Canvas>();
+            targetCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            targetCanvas.sortingOrder = 600;
+
+            CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
         }
 
-        canvasGroup = GetComponent<CanvasGroup>();
+        transform.SetParent(targetCanvas.transform, false);
+
+        RectTransform rootRect = GetComponent<RectTransform>();
+        if (rootRect == null)
+        {
+            rootRect = gameObject.AddComponent<RectTransform>();
+        }
+
+        rootRect.anchorMin = Vector2.zero;
+        rootRect.anchorMax = Vector2.one;
+        rootRect.offsetMin = Vector2.zero;
+        rootRect.offsetMax = Vector2.zero;
+
+        if (backgroundImage == null)
+        {
+            backgroundImage = GetComponent<Image>();
+        }
+
+        if (backgroundImage == null)
+        {
+            backgroundImage = gameObject.AddComponent<Image>();
+        }
+
+        backgroundImage.color = new Color(0f, 0f, 0f, 1f);
+        backgroundImage.raycastTarget = false;
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = GetComponent<CanvasGroup>();
+        }
+
         if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
 
-        if (rootRect != null)
+        canvasGroup.alpha = 1f;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+
+        GameObject textObject = transform.Find("EndText")?.gameObject;
+        if (textObject == null)
         {
-            rootRect.anchoredPosition = hiddenAnchoredPosition;
+            textObject = new GameObject("EndText", typeof(RectTransform), typeof(TextMeshProUGUI));
+            textObject.transform.SetParent(transform, false);
         }
 
-        SetPanelState(true, false);
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = 0f;
-        }
+        RectTransform textRect = textObject.GetComponent<RectTransform>();
+        textRect.anchorMin = new Vector2(0.1f, 0.15f);
+        textRect.anchorMax = new Vector2(0.9f, 0.85f);
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+
+        textComponent = textObject.GetComponent<TextMeshProUGUI>();
+        textComponent.fontSize = fontSize;
+        textComponent.color = textColor;
+        textComponent.alignment = TextAlignmentOptions.Center;
+        textComponent.textWrappingMode = TextWrappingModes.Normal;
+        textComponent.raycastTarget = false;
+        textComponent.alpha = 1f;
+        textComponent.maxVisibleCharacters = 0;
     }
 
-    private void OnEnable()
-    {
-        if (rootRect != null)
-        {
-            rootRect.anchoredPosition = hiddenAnchoredPosition;
-        }
-
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = 0f;
-        }
-    }
-
-    /// <summary>
-    /// Activates the end-screen and shows the win or lose panel, then slides the HUD into view.
-    /// True is win, False is lose
-    /// </summary>
     public void Show(bool win)
     {
+        if (endRoutine != null)
+        {
+            StopCoroutine(endRoutine);
+        }
+
+        string message = win ? winText : loseText;
         gameObject.SetActive(true);
 
-        SetPanelState(win, !win);
-
-        if (rootRect == null)
-        {
-            rootRect = GetComponent<RectTransform>();
-        }
-
-        if (rootRect == null)
-        {
-            return;
-        }
-
-        if (slideCoroutine != null)
-        {
-            StopCoroutine(slideCoroutine);
-        }
-
-        slideCoroutine = StartCoroutine(SlideIn());
-    }
-
-    public void Hide()
-    {
-        if (slideCoroutine != null)
-        {
-            StopCoroutine(slideCoroutine);
-            slideCoroutine = null;
-        }
-
-        if (rootRect != null)
-        {
-            rootRect.anchoredPosition = hiddenAnchoredPosition;
-        }
-
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = 0f;
-        }
-
-        gameObject.SetActive(false);
-    }
-
-    private void SetPanelState(bool showWin, bool showLose)
-    {
-        if (winPanel != null)
-        {
-            winPanel.gameObject.SetActive(showWin);
-        }
-
-        if (losePanel != null)
-        {
-            losePanel.gameObject.SetActive(showLose);
-        }
-    }
-
-    private IEnumerator SlideIn()
-    {
-        if (rootRect == null)
-        {
-            yield break;
-        }
-
-        Vector2 startPosition = hiddenAnchoredPosition;
-        Vector2 endPosition = visibleAnchoredPosition;
-        rootRect.anchoredPosition = startPosition;
-
-        float elapsed = 0f;
-
-        while (elapsed < slideDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float progress = Mathf.Clamp01(elapsed / slideDuration);
-            float eased = Mathf.SmoothStep(0f, 1f, progress);
-
-            rootRect.anchoredPosition = Vector2.Lerp(startPosition, endPosition, eased);
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = Mathf.Lerp(0f, 1f, eased);
-            }
-
-            yield return null;
-        }
-
-        rootRect.anchoredPosition = endPosition;
         if (canvasGroup != null)
         {
             canvasGroup.alpha = 1f;
         }
 
-        slideCoroutine = null;
+        if (textComponent != null)
+        {
+            textComponent.text = message;
+            textComponent.alpha = 1f;
+            textComponent.maxVisibleCharacters = 0;
+        }
+
+        endRoutine = StartCoroutine(PlayEndRoutine(message));
+    }
+
+    public void Hide()
+    {
+        if (endRoutine != null)
+        {
+            StopCoroutine(endRoutine);
+            endRoutine = null;
+        }
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+
+        if (textComponent != null)
+        {
+            textComponent.text = string.Empty;
+            textComponent.maxVisibleCharacters = 0;
+            textComponent.alpha = 0f;
+        }
+
+        gameObject.SetActive(false);
+    }
+
+    private IEnumerator PlayEndRoutine(string message)
+    {
+        if (textComponent == null || canvasGroup == null)
+        {
+            yield break;
+        }
+
+        textComponent.text = message;
+        textComponent.maxVisibleCharacters = 0;
+
+        int totalChars = message.Length;
+        while (textComponent.maxVisibleCharacters < totalChars)
+        {
+            textComponent.maxVisibleCharacters += 1;
+            yield return new WaitForSeconds(typeDelay);
+        }
+
+        yield return new WaitForSeconds(pauseAfterTyping);
+
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / fadeDuration);
+            float alpha = Mathf.Lerp(1f, 0f, t);
+            canvasGroup.alpha = alpha;
+            textComponent.alpha = alpha;
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+        textComponent.alpha = 0f;
+        endRoutine = null;
+        gameObject.SetActive(false);
     }
 }
