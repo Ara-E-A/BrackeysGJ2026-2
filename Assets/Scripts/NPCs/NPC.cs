@@ -3,14 +3,15 @@ using UnityEngine;
 public class NPC : Interactable
 {
     private NPCDialogue npcDialogue;
-    private AudioSource audioSource;
     public static NPC currentlySpeakingNpc;
+
+    /// <summary>The talking NPC's dialogue component, used by <see cref="ShowDialogue"/> to gate the voice loop.</summary>
+    public NPCDialogue Voice => npcDialogue;
 
     protected override void Awake()
     {
         base.Awake();
         npcDialogue = GetComponent<NPCDialogue>();
-        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -23,12 +24,9 @@ public class NPC : Interactable
 
     protected override void Interact()
     {
-        if (audioSource != null)
-        {
-            audioSource.Stop();
-            audioSource.Play();
-            currentlySpeakingNpc = this;
-        }
+        // The voice loop is driven by ShowDialogue.typeDialogue (only while text types);
+        // interacting just marks who is speaking.
+        currentlySpeakingNpc = this;
 
         ShowDialogue dialogueUI = FindAnyObjectByType<ShowDialogue>();
         if (dialogueUI == null)
@@ -55,9 +53,9 @@ public class NPC : Interactable
 
     public void StopVoice()
     {
-        if (audioSource != null)
+        if (npcDialogue != null)
         {
-            audioSource.Stop();
+            npcDialogue.StopVoice();
         }
 
         if (currentlySpeakingNpc == this)

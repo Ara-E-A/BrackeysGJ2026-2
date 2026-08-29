@@ -18,7 +18,48 @@ public class NPCDialogue : MonoBehaviour
              "for its lifetime (Souls messages are immutable).")]
     public bool rerollEachInteraction = false;
 
+    [Header("Voice")]
+    [Tooltip("Looping blip that sounds ONLY while a line is typing out. Auto-bound to the " +
+             "AudioSource on this object when left empty.")]
+    [SerializeField] private AudioSource voiceLoop;
+
     private bool hasInteracted = false;
+
+    private void Awake()
+    {
+        if (voiceLoop == null)
+        {
+            voiceLoop = GetComponent<AudioSource>();
+        }
+    }
+
+    /// <summary>
+    /// Start the typing blip loop. Called by <see cref="ShowDialogue"/> at the top of
+    /// <c>typeDialogue()</c>; safe to call again to restart it for the next line.
+    /// </summary>
+    public void StartVoice()
+    {
+        if (voiceLoop == null)
+        {
+            return;
+        }
+
+        voiceLoop.loop = true;
+        voiceLoop.Stop();
+        voiceLoop.Play();
+    }
+
+    /// <summary>
+    /// Stop the typing blip loop. Called when the final character of a line is rendered and
+    /// when the dialogue ends, so the loop never sounds while the player is reading/choosing.
+    /// </summary>
+    public void StopVoice()
+    {
+        if (voiceLoop != null)
+        {
+            voiceLoop.Stop();
+        }
+    }
 
     // Per-instance phrasing seed, fixed for the object's lifetime (re-drawn each Play session).
     private int phrasingSeed = -1;

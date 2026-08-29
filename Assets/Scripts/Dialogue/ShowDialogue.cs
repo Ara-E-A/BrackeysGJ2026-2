@@ -81,6 +81,10 @@ public class ShowDialogue : MonoBehaviour
             if (this.typingCoroutine != null)
             {
                 StopCoroutine(this.typingCoroutine);
+                if (NPC.currentlySpeakingNpc != null && NPC.currentlySpeakingNpc.Voice != null)
+                {
+                    NPC.currentlySpeakingNpc.Voice.StopVoice();
+                }
             }
 
             this.typingCoroutine = StartCoroutine(typeDialogue(dialogue));
@@ -91,11 +95,25 @@ public class ShowDialogue : MonoBehaviour
     {
         this.textField.text = string.Empty;
 
+        // The NPC's looping voice blip sounds only for the duration of the typing.
+        NPCDialogue voice = NPC.currentlySpeakingNpc != null ? NPC.currentlySpeakingNpc.Voice : null;
+        if (voice != null)
+        {
+            voice.StartVoice();
+        }
+
         foreach (char character in dialogue)
         {
             this.textField.text += character;
             yield return new WaitForSeconds(this.typingDelay);
         }
+
+        // Final character rendered - kill the loop so it never carries into the read/choose pause.
+        if (voice != null)
+        {
+            voice.StopVoice();
+        }
+
         this.typingCoroutine = null;
     }
 
