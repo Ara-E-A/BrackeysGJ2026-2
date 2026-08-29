@@ -4,6 +4,10 @@ public class Thingamabob : MonoBehaviour
 {
 	[SerializeField] private Thing.type spawnType = Thing.type.Note;
 	[SerializeField] [Range(0f, 100f)] private float spawnChance = 100f;
+	[Tooltip("Vertical offset applied to spawned NPCs, relative to this spawner's position.")]
+	[SerializeField] private float spawnYOffset = 0f;
+	[Tooltip("When on, the spawned object gets a random 0-360 yaw instead of this spawner's rotation.")]
+	[SerializeField] private bool randomizeYRotation = false;
 	[SerializeField] private GameObject npcPrefab;
 	[SerializeField] private GameObject notePrefab;
 	[SerializeField] private GameObject screenPrefab;
@@ -62,7 +66,13 @@ public class Thingamabob : MonoBehaviour
 
 	private GameObject SpawnPrefab(GameObject prefab)
 	{
-		GameObject spawned = Instantiate(prefab, transform.position, transform.rotation);
+		Vector3 spawnPosition = transform.position;
+		if (spawnType == Thing.type.NPC)
+		{
+			spawnPosition.y += spawnYOffset;
+		}
+
+		GameObject spawned = Instantiate(prefab, spawnPosition, GetSpawnRotation());
 		spawned.tag = "Clickable";
 		Thing thing = spawned.GetComponent<Thing>();
 		if (thing == null)
@@ -76,12 +86,20 @@ public class Thingamabob : MonoBehaviour
 	private GameObject SpawnCubeFallback()
 	{
 		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		cube.transform.SetPositionAndRotation(transform.position, transform.rotation);
+		cube.transform.SetPositionAndRotation(transform.position, GetSpawnRotation());
 		cube.tag = "Clickable";
 		Thing thing = cube.AddComponent<Thing>();
 		thing.thingType = spawnType;
 		Rigidbody rigidbody = cube.AddComponent<Rigidbody>();
 		rigidbody.useGravity = true;
 		return cube;
+	}
+
+	// Spawner rotation, or a random 0-360 yaw when randomizeYRotation is enabled.
+	private Quaternion GetSpawnRotation()
+	{
+		return randomizeYRotation
+			? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f)
+			: transform.rotation;
 	}
 }
