@@ -1,16 +1,28 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Zoom animation for the traveller's paper, driven by <see cref="PapersUI"/>:
+/// <see cref="Open"/> moves the paper into a centred focus position and scales it up,
+/// <see cref="Close"/> returns it to its resting corner.
+///
+/// Both states are animated in <see cref="RectTransform.anchoredPosition"/> /
+/// <see cref="RectTransform.sizeDelta"/> space - raw serialized layout data that is valid
+/// in <c>Awake</c> and independent of canvas scale - so opening/closing never shifts the
+/// paper to a different part of the screen.
+/// </summary>
 public class PaperHUD : MonoBehaviour
 {
 	[SerializeField] private RectTransform paper;
-	[SerializeField] private TextMeshProUGUI informationText;
 	[SerializeField] private float expandedScale = 2.5f;
 	[SerializeField] private float animationDuration = 0.35f;
 
-	private Vector3 originalPosition;
-	private Vector2 originalSize;
+	[Tooltip("anchoredPosition the paper animates to when opened (its focused/zoomed spot). " +
+	         "Default (0,0) centres it on the canvas.")]
+	[SerializeField] private Vector2 openAnchoredPosition = Vector2.zero;
+
+	private Vector2 closedAnchoredPosition;
+	private Vector2 closedSize;
 	private Coroutine animationCoroutine;
 
 	private void Awake()
@@ -20,21 +32,14 @@ public class PaperHUD : MonoBehaviour
 			paper = GetComponent<RectTransform>();
 		}
 
-		if (informationText == null)
-		{
-			informationText = GetComponentInChildren<TextMeshProUGUI>(true);
-		}
-
 		if (paper != null)
 		{
-			originalPosition = paper.position;
-			originalSize = paper.sizeDelta;
+			closedAnchoredPosition = paper.anchoredPosition;
+			closedSize = paper.sizeDelta;
 		}
-
-		SetInformationVisible(false);
 	}
 
-	/// <summary>Zoom the paper into focus without touching the info text (used by PapersUI).</summary>
+	/// <summary>Zoom the paper into its focused position.</summary>
 	public void Open()
 	{
 		if (paper == null)
@@ -42,88 +47,55 @@ public class PaperHUD : MonoBehaviour
 			return;
 		}
 
-		SetInformationVisible(false);
-		StartAnimation(GetExpandedPosition(), originalSize * expandedScale, false);
+		StartAnimation(openAnchoredPosition, closedSize * expandedScale);
 	}
 
-	/// <summary>Zoom the paper back to its resting place.</summary>
+	/// <summary>Zoom the paper back to its resting anchor.</summary>
 	public void Close()
-	{
-		HideImportantInformation();
-	}
-
-	public void ShowImportantInformation(string information)
-	{
-		if (paper == null || informationText == null)
-		{
-			Debug.LogError("PaperHUD needs a paper RectTransform and a TMP information text.");
-			return;
-		}
-
-		informationText.text = information;
-		SetInformationVisible(false);
-		StartAnimation(GetExpandedPosition(), originalSize * expandedScale, true);
-	}
-
-	public void HideImportantInformation()
 	{
 		if (paper == null)
 		{
 			return;
 		}
 
-		SetInformationVisible(false);
-		StartAnimation(originalPosition, originalSize, false);
+		StartAnimation(closedAnchoredPosition, closedSize);
 	}
 
-	private Vector3 GetExpandedPosition()
-	{
-		RectTransform parent = paper.parent as RectTransform;
-		if (parent == null)
-		{
-			return paper.position;
-		}
-
-		return parent.TransformPoint(parent.rect.center);
-	}
-
-	private void StartAnimation(Vector3 targetPosition, Vector2 targetSize, bool showTextWhenComplete)
+	private void StartAnimation(Vector2 targetPosition, Vector2 targetSize)
 	{
 		if (animationCoroutine != null)
 		{
 			StopCoroutine(animationCoroutine);
+			animationCoroutine = null;
 		}
 
-		animationCoroutine = StartCoroutine(AnimatePaper(targetPosition, targetSize, showTextWhenComplete));
+		if (!isActiveAndEnabled)
+		{
+			paper.anchoredPosition = targetPosition;
+			paper.sizeDelta = targetSize;
+			return;
+		}
+
+		animationCoroutine = StartCoroutine(AnimatePaper(targetPosition, targetSize));
 	}
 
-	private IEnumerator AnimatePaper(Vector3 targetPosition, Vector2 targetSize, bool showTextWhenComplete)
+	private IEnumerator AnimatePaper(Vector2 targetPosition, Vector2 targetSize)
 	{
-		Vector3 startPosition = paper.position;
+		Vector2 startPosition = paper.anchoredPosition;
 		Vector2 startSize = paper.sizeDelta;
 		float elapsed = 0f;
 
 		while (elapsed < animationDuration)
 		{
 			elapsed += Time.unscaledDeltaTime;
-			float progress = Mathf.Clamp01(elapsed / animationDuration);
-			progress = Mathf.SmoothStep(0f, 1f, progress);
-			paper.position = Vector3.LerpUnclamped(startPosition, targetPosition, progress);
+			float progress = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / animationDuration));
+			paper.anchoredPosition = Vector2.LerpUnclamped(startPosition, targetPosition, progress);
 			paper.sizeDelta = Vector2.LerpUnclamped(startSize, targetSize, progress);
 			yield return null;
 		}
 
-		paper.position = targetPosition;
+		paper.anchoredPosition = targetPosition;
 		paper.sizeDelta = targetSize;
-		SetInformationVisible(showTextWhenComplete);
 		animationCoroutine = null;
-	}
-
-	private void SetInformationVisible(bool visible)
-	{
-		if (informationText != null)
-		{
-			informationText.enabled = visible;
-		}
 	}
 }

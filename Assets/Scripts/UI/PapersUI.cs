@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -18,7 +20,7 @@ using UnityEngine.UI;
 /// world interaction is suppressed while the paper is open (see <see cref="Interactor"/>
 /// and <see cref="DialogManager"/>).
 /// </summary>
-public class PapersUI : MonoBehaviour
+public class PapersUI : MonoBehaviour, IPointerClickHandler
 {
     public static bool IsOpen { get; private set; }
 
@@ -54,6 +56,8 @@ public class PapersUI : MonoBehaviour
 
     private void Awake()
     {
+        IsOpen = false;
+
         paperHUD = GetComponent<PaperHUD>();
 
         Transform open = transform.Find("PapersOpen");
@@ -68,6 +72,39 @@ public class PapersUI : MonoBehaviour
         {
             closedText = text.GetComponent<TextMeshProUGUI>();
         }
+
+        if (papersOpen != null)
+        {
+            papersOpen.anchorMin = Vector2.zero;
+            papersOpen.anchorMax = Vector2.one;
+            papersOpen.offsetMin = Vector2.zero;
+            papersOpen.offsetMax = Vector2.zero;
+        }
+
+        if (papersOpenButton != null)
+        {
+            papersOpenButton.enabled = false;
+        }
+
+        // The paper's own Image must be a raycast target so clicks on the paper reach
+        // OnPointerClick (and so they are blocked from falling through to world
+        // interactibles - Interactor bails while the pointer is over any UI graphic).
+        if (TryGetComponent(out Image paperImage))
+        {
+            paperImage.raycastTarget = true;
+        }
+    }
+
+    private IEnumerator Start()
+    {
+        BuildFieldsOnce();
+        if (fieldsRoot != null)
+        {
+            fieldsRoot.SetActive(false);
+        }
+
+        yield return null;
+        ResolvePaper();
     }
 
     private void OnDisable()
@@ -91,6 +128,19 @@ public class PapersUI : MonoBehaviour
         {
             Close();
         }
+    }
+
+    // Clicking anywhere on the paper's own graphic runs the same toggle as the Tab key.
+    // Field widgets (input fields / dropdown) consume their own pointer clicks, so this
+    // only fires for clicks on the paper background - editing is unaffected.
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        Toggle();
     }
 
     public void Toggle()
@@ -126,24 +176,26 @@ public class PapersUI : MonoBehaviour
             openDialogue.EndNPCLine();
         }
 
-        GameManager gm = FindAnyObjectByType<GameManager>();
-        paper = gm != null ? gm.playerPaper : null;
+        ResolvePaper();
         if (paper == null)
         {
             Debug.LogWarning("PapersUI: no GameManager / PlayerPaper found; fields will be blank.");
         }
 
         BuildFieldsOnce();
-        RefreshFromPaper();
 
+        // Activate the widgets BEFORE pushing values in: TMP input fields only apply
+        // SetTextWithoutNotify cleanly once their OnEnable has run.
         if (fieldsRoot != null)
         {
             fieldsRoot.SetActive(true);
         }
 
-        if (papersOpenButton != null)
+        RefreshFromPaper();
+
+        if (closedText != null)
         {
-            papersOpenButton.enabled = false;
+            closedText.enabled = false;
         }
 
         if (paperHUD != null)
@@ -171,15 +223,24 @@ public class PapersUI : MonoBehaviour
             paperHUD.Close();
         }
 
-        if (closedText != null && paper != null)
+        if (closedText != null)
         {
-            closedText.text = paper.name;
+            closedText.enabled = true;
         }
 
         IsOpen = false;
     }
 
     // ---------------- field <-> paper ----------------
+
+    private void ResolvePaper()
+    {
+        GameManager gm = FindAnyObjectByType<GameManager>();
+        if (gm != null && gm.playerPaper != null)
+        {
+            paper = gm.playerPaper;
+        }
+    }
 
     private void RefreshFromPaper()
     {
@@ -192,8 +253,6 @@ public class PapersUI : MonoBehaviour
         originField.SetTextWithoutNotify(paper.origin ?? string.Empty);
         idField.SetTextWithoutNotify(Mathf.Clamp(Mathf.RoundToInt(paper.id), idMin, idMax).ToString());
 
-        // Correct any out-of-range height on the paper itself so it can never be submitted,
-        // then align the camera with it.
         int height = Mathf.Clamp(Mathf.RoundToInt(paper.height), HeightMin, HeightMax);
         paper.height = height;
         heightField.SetTextWithoutNotify(height.ToString());

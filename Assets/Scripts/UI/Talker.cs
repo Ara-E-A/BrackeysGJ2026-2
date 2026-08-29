@@ -47,7 +47,7 @@ public class Talker : MonoBehaviour
         }
 
         grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        grid.constraintCount = 2;
+        grid.constraintCount = 1;
         grid.cellSize = buttonSize;
         grid.spacing = spacing;
         transform.SetAsLastSibling();
