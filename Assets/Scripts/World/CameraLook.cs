@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using System.Collections;
 using System;
 using System.Linq;
@@ -13,7 +14,13 @@ public class CameraLook : MonoBehaviour
     [SerializeField] private float movementDuration = 0.35f;
     [SerializeField] private float rotationDuration = 0.35f;
     [SerializeField] private float heightDuration = 0.3f;
+
+    [SerializeField] private Button[] paneButtons;
+
     public Camera mainCamera;
+
+    /// <summary>True while a 90 turn animation is in progress. Rotation input is ignored until it clears.</summary>
+    public bool IsTurning { get; private set; }
 
     private Coroutine movementCoroutine;
     private Coroutine rotationCoroutine;
@@ -102,10 +109,25 @@ public class CameraLook : MonoBehaviour
 
     public void turnTo(Vector3 degrees)
     {
+        if (IsTurning)
+            return;
+
         if (rotationCoroutine != null)
             StopCoroutine(rotationCoroutine);
 
         rotationCoroutine = StartCoroutine(SmoothRotate(degrees));
+    }
+
+    private void SetPaneButtonsInteractable(bool value)
+    {
+        if (paneButtons == null)
+            return;
+
+        foreach (Button button in paneButtons)
+        {
+            if (button != null)
+                button.interactable = value;
+        }
     }
 
     public void moveForward()
@@ -119,6 +141,9 @@ public class CameraLook : MonoBehaviour
     // COROUTINES WOOOO
     private IEnumerator SmoothRotate(Vector3 degrees)
     {
+        IsTurning = true;
+        SetPaneButtonsInteractable(false);
+
         Quaternion startRotation = mainCamera.transform.rotation;
         Quaternion targetRotation = Quaternion.Euler(degrees) * startRotation;
         float elapsed = 0f;
@@ -133,6 +158,9 @@ public class CameraLook : MonoBehaviour
 
         mainCamera.transform.rotation = targetRotation;
         rotationCoroutine = null;
+
+        SetPaneButtonsInteractable(true);
+        IsTurning = false;
     }
 
     private IEnumerator SmoothMoveForward()
