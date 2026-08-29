@@ -12,6 +12,8 @@ using UnityEngine.Events;
 /// </summary>
 public class GameEvaluationManager : MonoBehaviour
 {
+    public static EndScreenUI esui;
+
     private static GameEvaluationManager instance;
 
     public static GameEvaluationManager Instance
@@ -21,6 +23,7 @@ public class GameEvaluationManager : MonoBehaviour
             if (instance == null)
             {
                 instance = FindAnyObjectByType<GameEvaluationManager>();
+                esui = FindAnyObjectByType<EndScreenUI>();
                 if (instance == null)
                 {
                     instance = new GameObject(nameof(GameEvaluationManager)).AddComponent<GameEvaluationManager>();
@@ -76,6 +79,7 @@ public class GameEvaluationManager : MonoBehaviour
         {
             Finished = true;
             Debug.Log("GameEvaluationManager: GAME OVER.");
+            esui.Show(false);
             onGameOver?.Invoke();
         }
     }
@@ -90,6 +94,7 @@ public class GameEvaluationManager : MonoBehaviour
 
         Finished = true;
         Debug.Log("GameEvaluationManager: VICTORY.");
+        esui.Show(true);
         onGameVictory?.Invoke();
     }
 }

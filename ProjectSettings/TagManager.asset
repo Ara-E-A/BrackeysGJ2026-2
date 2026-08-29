@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Clickable
   - TalkOnly
+  - Wall
+  - EndScreen
+  - EndScrreen
   layers:
   - Default
   - TransparentFX

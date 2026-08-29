@@ -47,7 +47,7 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
 
     private PlayerPaper paper;
 
-    private TMP_InputField nameField;
+    private TMP_Dropdown nameField;
     private TMP_InputField originField;
     private TMP_Dropdown sexField;
     private TMP_InputField idField;
@@ -249,7 +249,22 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        nameField.SetTextWithoutNotify(paper.name ?? string.Empty);
+        string[] availableNames = NameGenerator.GetNames();
+        if (nameField != null)
+        {
+            List<string> options = new List<string>(availableNames);
+            if (!string.IsNullOrWhiteSpace(paper.name) && !options.Contains(paper.name))
+            {
+                options.Add(paper.name);
+            }
+
+            nameField.ClearOptions();
+            nameField.AddOptions(options);
+
+            int nameIndex = options.IndexOf(paper.name ?? string.Empty);
+            nameField.SetValueWithoutNotify(nameIndex >= 0 ? nameIndex : 0);
+        }
+
         originField.SetTextWithoutNotify(paper.origin ?? string.Empty);
         idField.SetTextWithoutNotify(Mathf.Clamp(Mathf.RoundToInt(paper.id), idMin, idMax).ToString());
 
@@ -313,13 +328,20 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
         layout.childForceExpandHeight = false;
         layout.childAlignment = TextAnchor.UpperCenter;
 
-        nameField = AddInputRow("Name");
-        nameField.characterLimit = nameMaxLength;
-        nameField.contentType = TMP_InputField.ContentType.Standard;
-        nameField.onValidateInput = LettersOnly;
-        nameField.onValueChanged.AddListener(value =>
+        nameField = AddDropdownRow("Name");
+        List<string> nameOptions = new List<string>(NameGenerator.GetNames());
+        if (nameOptions.Count == 0)
         {
-            if (paper != null) paper.name = value;
+            nameOptions.Add(string.Empty);
+        }
+        nameField.ClearOptions();
+        nameField.AddOptions(nameOptions);
+        nameField.onValueChanged.AddListener(index =>
+        {
+            if (paper != null && index >= 0 && index < nameField.options.Count)
+            {
+                paper.name = nameField.options[index].text;
+            }
         });
 
         originField = AddInputRow("Origin");

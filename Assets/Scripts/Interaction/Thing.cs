@@ -14,7 +14,7 @@ using UnityEngine;
 public class Thing : Interactable
 {
     // Flavour tag only (used by Thingamabob and the inspector); no longer drives behaviour.
-    public enum type { Note, Table, Screen }
+    public enum type { Note, Table, Screen, NPC }
     public type thingType;
 
     [TextArea]
