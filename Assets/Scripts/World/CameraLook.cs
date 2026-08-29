@@ -29,7 +29,7 @@ public class CameraLook : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 120;
-        getCamTrans();
+        getCamTrans(); // Me too, camera
 
         GameManager gameManager = FindAnyObjectByType<GameManager>();
         if (gameManager != null && gameManager.playerPaper != null)
@@ -132,8 +132,23 @@ public class CameraLook : MonoBehaviour
 
     public void moveForward()
     {
+        if (mainCamera == null)
+            getCamTrans();
+
+        if (mainCamera == null)
+            return;
+
         if (movementCoroutine != null)
             StopCoroutine(movementCoroutine);
+
+        if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out RaycastHit hit, 6f))
+        {
+            if (hit.collider.CompareTag("Wall") || hit.collider.CompareTag("Clickable"))
+            {
+                movementCoroutine = StartCoroutine(SmoothMoveForwardBlocked());
+                return;
+            }
+        }
 
         movementCoroutine = StartCoroutine(SmoothMoveForward());
     }
@@ -181,5 +196,34 @@ public class CameraLook : MonoBehaviour
         movementCoroutine = null;
     }
 
+    private IEnumerator SmoothMoveForwardBlocked()
+    {
+        Vector3 startPosition = mainCamera.transform.position;
+        Vector3 bumpForward = mainCamera.transform.forward * Mathf.Min(1.5f, moveDistance * 0.25f);
+        Vector3 bumpTarget = startPosition + bumpForward;
+        float firstHalf = Mathf.Max(0.08f, movementDuration * 0.45f);
+        float secondHalf = Mathf.Max(0.08f, movementDuration - firstHalf);
+        float elapsed = 0f;
+
+        while (elapsed < firstHalf)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / firstHalf);
+            mainCamera.transform.position = Vector3.Lerp(startPosition, bumpTarget, progress);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < secondHalf)
+        {
+            elapsed += Time.deltaTime;
+            float progress = Mathf.Clamp01(elapsed / secondHalf);
+            mainCamera.transform.position = Vector3.Lerp(bumpTarget, startPosition, progress);
+            yield return null;
+        }
+
+        mainCamera.transform.position = startPosition;
+        movementCoroutine = null;
+    }
 
 }
