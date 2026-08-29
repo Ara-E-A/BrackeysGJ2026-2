@@ -22,6 +22,9 @@ public class CameraLook : MonoBehaviour
     /// <summary>True while a 90 turn animation is in progress. Rotation input is ignored until it clears.</summary>
     public bool IsTurning { get; private set; }
 
+    /// <summary>True while a forward step (or a blocked bump) is in progress. Forward input is ignored until it clears.</summary>
+    public bool IsMoving { get; private set; }
+
     private Coroutine movementCoroutine;
     private Coroutine rotationCoroutine;
     private Coroutine heightCoroutine;
@@ -132,6 +135,9 @@ public class CameraLook : MonoBehaviour
 
     public void moveForward()
     {
+        if (IsMoving)
+            return;
+
         if (mainCamera == null)
             getCamTrans();
 
@@ -180,6 +186,9 @@ public class CameraLook : MonoBehaviour
 
     private IEnumerator SmoothMoveForward()
     {
+        IsMoving = true;
+        SetPaneButtonsInteractable(false);
+
         Vector3 startPosition = mainCamera.transform.position;
         Vector3 targetPosition = startPosition + mainCamera.transform.forward * moveDistance;
         float elapsed = 0f;
@@ -194,10 +203,16 @@ public class CameraLook : MonoBehaviour
 
         mainCamera.transform.position = targetPosition;
         movementCoroutine = null;
+
+        SetPaneButtonsInteractable(true);
+        IsMoving = false;
     }
 
     private IEnumerator SmoothMoveForwardBlocked()
     {
+        IsMoving = true;
+        SetPaneButtonsInteractable(false);
+
         Vector3 startPosition = mainCamera.transform.position;
         Vector3 bumpForward = mainCamera.transform.forward * Mathf.Min(1.5f, moveDistance * 0.25f);
         Vector3 bumpTarget = startPosition + bumpForward;
@@ -224,6 +239,9 @@ public class CameraLook : MonoBehaviour
 
         mainCamera.transform.position = startPosition;
         movementCoroutine = null;
+
+        SetPaneButtonsInteractable(true);
+        IsMoving = false;
     }
 
 }
