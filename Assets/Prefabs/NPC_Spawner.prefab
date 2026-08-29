@@ -45,4 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Thingamabob
   spawnType: 3
+  spawnChance: 60
   npcPrefab: {fileID: 3604346877304926279, guid: 4c87913175a34107eb3f98165c7329bc, type: 3}
+  notePrefab: {fileID: 8870003924967312762, guid: e0229c08c986229f69a84bf2c7285554, type: 3}
+  screenPrefab: {fileID: 8870003924967312762, guid: ea4c7a58d03142c2193695afa6aa2eab, type: 3}
+  tablePrefab: {fileID: 8870003924967312762, guid: 2381931561e94b7efb02ffb7af0c0241, type: 3}

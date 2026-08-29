@@ -61,6 +61,11 @@ public class ShowDialogue : MonoBehaviour
 
     public void EndNPCLine()
     {
+        if (NPC.currentlySpeakingNpc != null)
+        {
+            NPC.currentlySpeakingNpc.StopVoice();
+        }
+
         if (talker != null)
         {
             talker.WipeButtons();
