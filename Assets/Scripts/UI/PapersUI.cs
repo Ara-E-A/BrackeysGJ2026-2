@@ -31,6 +31,7 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
     [Header("Field caps")]
     [SerializeField] private int nameMaxLength = 20;
     [SerializeField] private int originMaxLength = 20;
+    [Tooltip("Fallback age bounds; overridden at runtime by PaperReq's AgeRule range.")]
     [SerializeField] private int ageMin = 0;
     [SerializeField] private int ageMax = 108;
     [SerializeField] private int idMin = 0;
@@ -130,9 +131,9 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    // Clicking anywhere on the paper's own graphic runs the same toggle as the Tab key.
-    // Field widgets (input fields / dropdown) consume their own pointer clicks, so this
-    // only fires for clicks on the paper background - editing is unaffected.
+    // A direct left-click on the paper opens it. It must NOT close it: once open, clicks
+    // that miss a widget (labels, row gaps, the paper margin) would otherwise bubble here
+    // and shut the form mid-edit, which reads as "the fields don't work". Close with Tab/Esc.
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)
@@ -140,7 +141,10 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        Toggle();
+        if (!IsOpen)
+        {
+            Open();
+        }
     }
 
     public void Toggle()
@@ -240,6 +244,14 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
         {
             paper = gm.playerPaper;
         }
+
+        // Widen the age cap to the full generated domain if PaperReq allows more than the
+        // serialized default, but never narrow it - the player must be able to type any
+        // plausible age (the rule check happens at submission, not here).
+        if (gm != null && gm.req != null && gm.req.AgeRule != null && gm.req.AgeRule.ageRange != null)
+        {
+            ageMax = Mathf.Max(ageMax, gm.req.AgeRule.ageRange.Item2);
+        }
     }
 
     private void RefreshFromPaper()
@@ -273,7 +285,9 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
         heightField.SetTextWithoutNotify(height.ToString());
         UpdateCameraHeight();
 
-        ageField.SetTextWithoutNotify(Mathf.RoundToInt(paper.age).ToString());
+        int age = Mathf.Clamp(Mathf.RoundToInt(paper.age), ageMin, ageMax);
+        paper.age = age;
+        ageField.SetTextWithoutNotify(age.ToString());
 
         int sexIndex = Array.IndexOf(PlayerPaper.AllSexes, paper.sex);
         sexField.SetValueWithoutNotify(sexIndex < 0 ? 0 : sexIndex);
@@ -398,6 +412,15 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
 
         ageField = AddInputRow("Age");
         ageField.contentType = TMP_InputField.ContentType.IntegerNumber;
+        ageField.characterLimit = 3;
+        ageField.onValidateInput = DigitsOnly;
+        ageField.onValueChanged.AddListener(value =>
+        {
+            // Live: positive digits only -> clamp into the AgeRule band -> store.
+            int.TryParse(value, out int parsed);
+            int clamped = Mathf.Clamp(parsed, ageMin, ageMax);
+            if (paper != null) paper.age = clamped;
+        });
         ageField.onEndEdit.AddListener(value =>
         {
             int.TryParse(value, out int parsed);
@@ -410,6 +433,12 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
     private static char LettersOnly(string text, int charIndex, char addedChar)
     {
         return char.IsLetter(addedChar) ? addedChar : '\0';
+    }
+
+    // Positive integers only: rejects sign, decimal point and any non-digit keystroke.
+    private static char DigitsOnly(string text, int charIndex, char addedChar)
+    {
+        return char.IsDigit(addedChar) ? addedChar : '\0';
     }
 
     // Digits only, and rejects any keystroke that would push the value above HeightMax.
@@ -454,6 +483,7 @@ public class PapersUI : MonoBehaviour, IPointerClickHandler
         labelText.fontSize = 14f;
         labelText.color = Color.black;
         labelText.alignment = TextAlignmentOptions.MidlineLeft;
+        labelText.raycastTarget = false; // labels never take clicks - keep them off the raycast path
         labelGO.GetComponent<LayoutElement>().preferredWidth = 70f;
 
         return row;
