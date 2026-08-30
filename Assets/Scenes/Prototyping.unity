@@ -7098,11 +7098,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c60a8e945d8af375ebde5ccd74c00861, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndScreenUI
-  winPanel: {fileID: 2034534896}
-  losePanel: {fileID: 78155540}
-  slideDuration: 0.6
-  visibleAnchoredPosition: {x: 0, y: 0}
-  hiddenAnchoredPosition: {x: 0, y: -500}
+  winText: "You made it through. \n\nYou successfully fooled the clerk and snuck
+    into the country.\n\nyour vacation was quite boring and it never stopped raining.\n\nyou
+    spent most of your time in the hotel, making their complimentary tea and then
+    forgetting to drink it before it got cold.\n\nlucky you"
+  loseText: 'The Authorities caught on.
+
+
+    You were detained and promptly Transported
+    away from the premises, fined 12 dollars for wasting time and issued a restraining
+    warrant from the checkpoint.
+
+
+    You spent the rest of your vacation at home
+    making tea and forgetting to drink it until it was cold.
+
+
+    Game Over'
+  typeDelay: 0.08
+  pauseAfterTyping: 1.2
+  fadeDuration: 9999
+  fontSize: 54
+  textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &977961592
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,14 +23,33 @@ public class GameEvaluationManager : MonoBehaviour
             if (instance == null)
             {
                 instance = FindAnyObjectByType<GameEvaluationManager>();
-                esui = FindAnyObjectByType<EndScreenUI>();
                 if (instance == null)
                 {
                     instance = new GameObject(nameof(GameEvaluationManager)).AddComponent<GameEvaluationManager>();
                 }
+
+                EnsureEndScreenReference();
+            }
+            else if (esui == null)
+            {
+                EnsureEndScreenReference();
             }
 
             return instance;
+        }
+    }
+
+    private static void EnsureEndScreenReference()
+    {
+        if (esui == null)
+        {
+            esui = FindAnyObjectByType<EndScreenUI>(FindObjectsInactive.Include);
+        }
+
+        if (esui == null)
+        {
+            GameObject endScreenObject = new GameObject("EndScreenUI");
+            esui = endScreenObject.AddComponent<EndScreenUI>();
         }
     }
 
@@ -53,6 +72,7 @@ public class GameEvaluationManager : MonoBehaviour
         }
 
         instance = this;
+        EnsureEndScreenReference();
         AttemptsRemaining = Mathf.Max(1, maxAttempts);
     }
 
