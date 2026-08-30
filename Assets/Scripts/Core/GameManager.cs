@@ -15,9 +15,9 @@ public class GameManager : MonoBehaviour
         //Generate player identity
         playerPaper = new PlayerPaper();
 
-        //Generate clues
+        //Generate clues and hand them out so every required rule is covered by an NPC or Thing
         ClueGenerator generator = new ClueGenerator(req);
-        clues = generator.GenerateClues();
+        clues = generator.GenerateAndDistribute();
 
         Debug.Log("Rules, PlayerPaper, and Clues generated.");
 
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
             dialoguePopulator.Populate();
         }
 
-        //Hand clues out to the ClueHolders in the scene
+        //Fallback: fill any remaining ClueHolders (non NPC/Thing) the generator did not assign
         ClueDistributor distributor = FindAnyObjectByType<ClueDistributor>();
         if (distributor != null)
         {

@@ -34,15 +34,113 @@ public class ClueGenerator
     public List<Clue> GenerateClues()
     {
         List<Clue> clues = new List<Clue>();
+        Dictionary<RuleType, List<Clue>> table = BuildClueTable();
 
-        clues.AddRange(GenerateAgeClues());
-        clues.AddRange(GenerateHeightClues());
-        clues.AddRange(GenerateOriginClues());
-        clues.AddRange(GenerateNameClues());
-        clues.AddRange(GenerateSexClues());
-        clues.AddRange(GenerateIDClues());
+        foreach (RuleType rule in System.Enum.GetValues(typeof(RuleType)))
+        {
+            clues.AddRange(table[rule]);
+        }
 
         return clues;
+    }
+
+    /// <summary>
+    /// Generates every clue and hands them to the scene's NPC / Thing <see cref="ClueHolder"/>s
+    /// so that <b>each</b> required rule (Age, Height, Origin, Name, Sex, ID) is delivered by at
+    /// least one NPC or Thing. Required coverage is assigned first - one clue per rule, spread
+    /// across the available holders - and only then are the remaining clues dealt at random to
+    /// whatever holders are left over (wrapping around when holders outnumber clues, like
+    /// <see cref="ClueDistributor"/>). Clue formats and truth/lie logic are unchanged: the same
+    /// per-rule methods that back <see cref="GenerateClues"/> produce them. Returns the full
+    /// clue list for <see cref="GameManager.clues"/>.
+    /// </summary>
+    public List<Clue> GenerateAndDistribute()
+    {
+        Dictionary<RuleType, List<Clue>> table = BuildClueTable();
+
+        List<Clue> allClues = new List<Clue>();
+        foreach (RuleType rule in System.Enum.GetValues(typeof(RuleType)))
+        {
+            allClues.AddRange(table[rule]);
+        }
+
+        // Delivery points: holders an NPC or a Thing will actually read, minus any that
+        // already hold a real (payload-populated) clue.
+        List<ClueHolder> holders = Object
+            .FindObjectsByType<ClueHolder>(FindObjectsInactive.Include)
+            .Where(h => h != null
+                     && (h.GetComponent<NPC>() != null || h.GetComponent<Thing>() != null)
+                     && (h.clue == null || h.clue.payload == null))
+            .ToList();
+        Shuffle(holders);
+
+        int cursor = 0;
+        List<Clue> leftovers = new List<Clue>();
+
+        // ---- Phase 1: one guaranteed clue per required rule ----
+        foreach (RuleType rule in System.Enum.GetValues(typeof(RuleType)))
+        {
+            List<Clue> options = table[rule];
+            int chosen = Random.Range(0, options.Count);
+
+            if (cursor < holders.Count)
+            {
+                holders[cursor++].clue = options[chosen];
+            }
+            else
+            {
+                Debug.LogWarning($"ClueGenerator: only {holders.Count} NPC/Thing clue holder(s) " +
+                                 $"for 6 required rules - '{rule}' has no guaranteed delivery point.");
+                leftovers.Add(options[chosen]);
+            }
+
+            for (int i = 0; i < options.Count; i++)
+            {
+                if (i != chosen)
+                {
+                    leftovers.Add(options[i]);
+                }
+            }
+        }
+
+        // ---- Phase 2: optional / random clues fill whatever holders remain ----
+        Shuffle(leftovers);
+        while (cursor < holders.Count)
+        {
+            if (leftovers.Count == 0)
+            {
+                leftovers.AddRange(allClues);
+                Shuffle(leftovers);
+            }
+
+            holders[cursor++].clue = leftovers[leftovers.Count - 1];
+            leftovers.RemoveAt(leftovers.Count - 1);
+        }
+
+        return allClues;
+    }
+
+    // The four clues (True / False / HalfTrue / Misleading) for every required rule.
+    private Dictionary<RuleType, List<Clue>> BuildClueTable()
+    {
+        return new Dictionary<RuleType, List<Clue>>
+        {
+            { RuleType.Age, GenerateAgeClues() },
+            { RuleType.Height, GenerateHeightClues() },
+            { RuleType.Origin, GenerateOriginClues() },
+            { RuleType.Name, GenerateNameClues() },
+            { RuleType.Sex, GenerateSexClues() },
+            { RuleType.ID, GenerateIDClues() },
+        };
+    }
+
+    private static void Shuffle<T>(IList<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 
     // ---------------- AGE ----------------
