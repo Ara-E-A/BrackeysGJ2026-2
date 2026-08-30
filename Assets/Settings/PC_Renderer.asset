@@ -78,13 +78,13 @@ MonoBehaviour:
     fogFar: 0.6
     fogContribution: 0.15
     colorEdgeThreshold: 0.01
-    depthEdgeThreshold: 0.03
+    depthEdgeThreshold: 0.1
     edgeIntensity: 1
     edgeColor: {r: 0, g: 0, b: 0, a: 1}
     edgeWidth: 1
-    saturation: 1.5
-    contrast: 1
-    gamma: 1
+    saturation: 2
+    contrast: 1.05
+    gamma: 0.75
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -104,7 +104,7 @@ MonoBehaviour:
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1
-    Intensity: 0.4
+    Intensity: 2
     DirectLightingStrength: 0.25
     Radius: 0.3
     Samples: 1
